@@ -1,0 +1,257 @@
+ARC-Seal: i=3; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=fDY4MOiZhpJhWpB6Aiir9veTdZvjB2ZpxGZQoH1CI1yyufEj8KW6j/BcK8RjUKrZ++mtGF1ZiI2D/GvvKs0BIb4C1QGmJOF2mBejP77pMsGYTUSibpq0WPcx4GeevsBvEzqNaht1jdaSVRTSo5+RttBwj3Xmeav0D8i4pLMn/8WJ8OWRUXxcclOzUKJY6RLbKBtUQt/Iv7sxaJnFj0j1p3TBGVQFcqi2yYda//89f95S0+qiMyaB4SWJ7Zd54uuTL25RICTiLBBk6kuihIKsWNVlfXPTznUjCXuPHFPIeLZ8Ak82IBqimLDy3qeYm4OcbxZtTlmwn0YMCMmhqqgiag==
+ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+ b=l4r7Ob1n05xGm7BQbZgFYih551uWD2j/6k9dWwf6gU5yE6v9av0+tKsg3kVmp57sI9UVwbtMca9+Uuc3zwn9t7i5cZIOrHa0xRQJnjNDJh3G2l1lzrwi5NK1WSQDFrrvIKiAp3kfVRBbo4knT75RlpCBVUIx0hZ8jFZ54y2DIgghtkPmVAQZXs1i0s8wEEkGI5tpyB5ZdVeP24cKSXDUsr8HDh8vVLm4pg2F+Zl45d+EBsl73EqyIBlu849RZr4CU95hQPTdaL8fHG0lOeuZuOZjlSlNzyYDnUrz1LrRIBEged7bu4NbVMHNGuQ7m4Uy/h8rWLhOb7AVDBXkMNhd1A==
+ARC-Authentication-Results: i=3; mx.microsoft.com 1; spf=pass (sender ip is
+ 209.85.208.172) smtp.rcpttodomain=dynamate.be smtp.mailfrom=esign.eu;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=mcalson.com;
+ dkim=pass (signature was verified) header.d=mcalson.com; arc=pass (0 oda=1
+ ltdi=1
+ spf=[1,2,smtp.mailfrom=bounces+33817899-0853-matthias=esign.eu@send.mcalson.com]
+ dkim=[1,2,header.i=@mcalson.com] dmarc=[1,2,header.from=mcalson.com])
+Received: from DU2PR04CA0198.eurprd04.prod.outlook.com (2603:10a6:10:28d::23)
+ by DBBPR03MB7131.eurprd03.prod.outlook.com (2603:10a6:10:1f4::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.11; Thu, 5 Dec
+ 2024 15:45:07 +0000
+Received: from DU2PEPF0001E9BF.eurprd03.prod.outlook.com
+ (2603:10a6:10:28d:cafe::68) by DU2PR04CA0198.outlook.office365.com
+ (2603:10a6:10:28d::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.10 via Frontend Transport; Thu,
+ 5 Dec 2024 15:45:07 +0000
+Authentication-Results: spf=pass (sender IP is 209.85.208.172)
+ smtp.mailfrom=esign.eu; dkim=pass (signature was verified)
+ header.d=mcalson.com;dmarc=pass action=none
+ header.from=mcalson.com;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of esign.eu designates
+ 209.85.208.172 as permitted sender) receiver=protection.outlook.com;
+ client-ip=209.85.208.172; helo=mail-lj1-f172.google.com; pr=C
+Received: from mail-lj1-f172.google.com (209.85.208.172) by
+ DU2PEPF0001E9BF.mail.protection.outlook.com (10.167.8.68) with Microsoft SMTP
+ Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.7 via
+ Frontend Transport; Thu, 5 Dec 2024 15:45:07 +0000
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ffc80318c9so8808421fa.2
+        for <matthias.stevens@dynamate.be>; Thu, 05 Dec 2024 07:45:07 -0800 (PST)
+ARC-Seal: i=2; a=rsa-sha256; t=1733413506; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=WXOtm/IuJGNq6cOQJwdwRGDYzpxkrY52WW8NqScuIi7iYO2O/HjuOlRbvJBw7avamg
+         i4wVTJj8i76nggLyS0tC56dnGTNEiN/nHphYeEOCWRFFLAyEm4Dns9Hs896ZZxn3GZZE
+         VHcvjW9Dc/1nguchrwlgdbIUtiNHm0Tw9dlNvkiu1A3WKxGQtlBeDQahFpeQ+R0YHV97
+         +u9sKwNkirmRWX+E9pzSSrdeX46LutampFPfY/5njQe1jyCq/85O1dug/p9Kwu+9V7FS
+         5I/MSwh2tGgyhIw0lqTsj/kMvHdI6ywNv5mKXCWZn0caVHEiMOpL3tyJXGX8bMoxxC+q
+         wATg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id
+         :mime-version:from:date:dkim-signature:delivered-to;
+        bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+        fh=WPbXAQcukTeRvz0Ne0GVwsOAgVsYcMM8UF9+6G20IK8=;
+        b=aO6RVm9Auiox94NMSGa8g9jbjgN8w2NcKAPjfocYvjjbqBnPd1UTVaMVWpspKdMI7X
+         fA+iWRVIWwT6fIKxPeibhmUY84bYkDYh9xBDaFpz42z71s6xUE/IwpiGLrEGcEIWzzT1
+         MiYK5Atx7GkLoZ4c3KbZQDz2UpZ05TcLhE927G4/v+JtAq88LyW2Y9uR1+w6P2fJ7VFU
+         VpzDpMfK3dNQFPC8oKQp9RqjN66vcqFA89IgU9/9TVA4kHNr1hpvGulmH2YDC2ApZaR1
+         Y3ie1m7TMsY1HqLUv7bSsZmFxE1mwF54cw05eQ0UxO0Kwjof1JcybWYcJsffxl8mHlHz
+         dnsw==;
+        darn=dynamate.be
+ARC-Authentication-Results: i=2; mx.google.com;
+       dkim=pass header.i=@mcalson.com header.s=kl header.b=FYgV0RFY;
+       spf=pass (google.com: domain of bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates 168.245.31.178 as permitted sender) smtp.mailfrom="bounces+33817899-0853-matthias=esign.eu@send.mcalson.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=mcalson.com
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733413506; x=1734018306;
+        h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id
+         :mime-version:from:date:dkim-signature:delivered-to:x-forwarded-for
+         :x-forwarded-to:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+        b=QgdCSilLfQLf0MGgiq0wXro5JNJKG8B+3s0uXkDYKFQ5lAaUufnW/YvegYpqez5VwS
+         3B5HMyXA5w9jjBrO0TylEiPXy5Q6Sgs1/QDADVLHtvooMBfd/BYHo7V9EpbituMu5IFt
+         JmEVfBue0VhH5+6R37XXxfz0CJ4YUNy7g6aWRqxPvdjAcR5uXO6809jYPCmfiN2JtJzp
+         8VZ4BllW1kyp9dXBYL1kebhmekZns/PIOWYuDz+af2PsZAmNpCPl0mdAZp19jIViMNMt
+         jbGuwS0xP5ZUNS+O/9sQpghuTKv5ip3SGT9qHzNXOC0QPWWcTm47xKK3SRCYNiKsPz3b
+         QHiQ==
+X-Forwarded-Encrypted: i=2; AJvYcCX7av4qeRhTXBEIDuH4a4YlrJcBLn0fq6xeSPUF5jAiFHbLGXZb7Qq76a709Y+yyY4Quq/PF+o1LgpV3xSYM6ny@dynamate.be
+X-Gm-Message-State: AOJu0YxU3VJF4ygselU8necrAEss+AqfFwG9uSbBnn5Eefy6bJdds/kw
+	fRpBSpAXgv7Nm20+PsteVI+6hj/qYevb2+m8W+Fjl9r0CuSOuiGcgC1tU3w0kCbOIvYQn8hu+br
+	2y9/0kaZj6JPoxfg68J66qAsLWkkyCcp80y43OAm0O0UHeM3n/kLmmG8Ov4/vrDrHvSIgevLGlI
+	ukPCk=
+X-Received: by 2002:a2e:b890:0:b0:2f7:543a:3b1a with SMTP id 38308e7fff4ca-30009bd1c0cmr61485691fa.7.1733413506180;
+        Thu, 05 Dec 2024 07:45:06 -0800 (PST)
+X-Forwarded-To: matthias.stevens@dynamate.be
+X-Forwarded-For: matthias@esign.eu matthias.stevens@dynamate.be
+Delivered-To: matthias@esign.eu
+Received: by 2002:a2e:b5d0:0:b0:2ff:b151:bce1 with SMTP id g16csp210443ljn;
+        Thu, 5 Dec 2024 07:45:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGihtONFNe0ZQmt8neva9m2oCO3X5kL4Gj5XaMJoyPhCJLcPUDgQmMwI3qHXAOMwJ33tgvm
+X-Received: by 2002:a17:902:cecb:b0:215:3998:189f with SMTP id d9443c01a7336-215f3c5a670mr54234985ad.6.1733413502096;
+        Thu, 05 Dec 2024 07:45:02 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1733413502; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gOXnhI1l1iOoQVC2iOGelo5j0CgxfTfAZxuGTWvCPz5WuSGK56IUizJvn5LtcY2Mg2
+         +p01XaZ3WQYSxjwLR5b+WS783/0GvbxwDwYQHujvhYwxDeu89UTSMpbdR0iSo2Me7BjI
+         alaubbcqFp0qFh/PaGyQlAo/gN+FKDwcwUDrF7jbFixeFHrYfP/D+R6L+SxNyJlFdMqB
+         kmXlK9XnQOo4oREdEzy/c4N6G25weHiGD0xK/KNmKHrmC5MUxsQZI6Lc9TR/i8uzpeyL
+         XwC8Vmdiv91OVhzNHmvAF3uha3jtsC+QjCIqTZE6FgzAUCZjOJvcCo/Y7RmptRs/BN8z
+         3zRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id
+         :mime-version:from:date:dkim-signature;
+        bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+        fh=caNR/YRUhfferXcZwyNQZyI1RI34QOu5tDIw1g7aUNU=;
+        b=QZhABDjdJxlGj2AaFl0/2IPOgWBRfBc1Rf1O8PNJNtb+pOUh+dJKNq3XLni04JlFE6
+         eirlquk6LI1G2rGxeuYXUMDOfwRL0hocX5qjPUdjwwfxbzOy+NIGx49P9xlk+YGrCxSC
+         YTRtV8buDMlOGKbLJmPqBo6wD8HDCs6MfxvqFmOv1+tnZAIh9Kv0yNeYxetRU1lWTtbu
+         /JLxmB8MNtmnAmJ5BBelELc4ZOgr+mVvyWSFDjS4+XQ4DsulOoFlWSZvHAmUsVC3Ua9S
+         skVNgwhjvvNbP571L84KUFPiplsoWrjINwNav/XHAvpxib9nLEvlHwuTqv6sKC4ueKVx
+         KLlw==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@mcalson.com header.s=kl header.b=FYgV0RFY;
+       spf=pass (google.com: domain of bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates 168.245.31.178 as permitted sender) smtp.mailfrom="bounces+33817899-0853-matthias=esign.eu@send.mcalson.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=mcalson.com
+Return-Path: matthias+caf_=matthias.stevens=dynamate.be@esign.eu
+Received: from o1328.shared.klaviyomail.com (o1328.shared.klaviyomail.com. [168.245.31.178])
+        by mx.google.com with ESMTPS id d9443c01a7336-215f8f0bccesi19444865ad.333.2024.12.05.07.45.00
+        for <matthias@esign.eu>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2024 07:45:02 -0800 (PST)
+Received-SPF: pass (google.com: domain of bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates 168.245.31.178 as permitted sender) client-ip=168.245.31.178;
+Authentication-Results-Original: mx.google.com;       dkim=pass
+ header.i=@mcalson.com header.s=kl header.b=FYgV0RFY;       spf=pass
+ (google.com: domain of
+ bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates
+ 168.245.31.178 as permitted sender)
+ smtp.mailfrom="bounces+33817899-0853-matthias=esign.eu@send.mcalson.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=mcalson.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mcalson.com;
+	h=content-type:from:mime-version:subject:list-unsubscribe-post:
+	list-unsubscribe:to:cc:content-type:from:subject:to;
+	s=kl; bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+	b=FYgV0RFY0EfrSPSkF//BZusF6nOYUIJTnVLTKYkdVKfD5MdrGdIML03BLKhKHP7LtA9d
+	J0O4nuLgHxH15Nitf2YVEhdOqXZ4qSXRE+ExnSjJCcmcwyUjshQSQ6JKXVQhtSJi8wRQvX
+	qEHxwagVBRmz61NBTLATTOtVzKF/ImVPa1ZvV1eVvl/SA+FbwWV1Tz6fxymHjMTseyhsyR
+	CVO/FsvxZxhoZUB60r9RCyFdNcOPoxwnxs90ewRj4L9lEEw4//ACMs5cwC7XWJfXw0mqjA
+	PiMOOfMXuFjvhuYuddJW9FLf4TpJziW5ekHH5y5kWhMOxu1jf2NYRPqlDiESyQIA==
+Received: by recvd-84b546689d-bxfnp with SMTP id recvd-84b546689d-bxfnp-1-6751CA7B-2B
+	2024-12-05 15:44:59.474208357 +0000 UTC m=+1794043.077279335
+Received: from MzM4MTc4OTk (unknown)
+	by geopod-ismtpd-35 (SG) with HTTP
+	id M5FwYtcxSUCfPw-4PwWkpg
+	Thu, 05 Dec 2024 15:44:59.436 +0000 (UTC)
+Content-Type: text/plain
+Date: Thu, 05 Dec 2024 15:44:59 +0000 (UTC)
+From: McAlson <info@mcalson.com>
+Mime-Version: 1.0
+Message-ID: <M5FwYtcxSUCfPw-4PwWkpg@geopod-ismtpd-35>
+Subject: =?UTF-8?B?8J+OgQ==?= New Christmas prints, packs & gift ideas!
+X-Kmail-Ops: 01GYJ2S0N9CHBBPJK4HFF6JFV2
+X-Report-Abuse: Please report any spam or abuse to: abuse@klaviyo.com
+X-Kmail-Account: Rm8aND
+X-Kmail-Message: 01JEBM2JJX5QX8DPM58C6YXBWM
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+List-Unsubscribe:
+ =?us-ascii?Q?=3Chttps=3A=2F=2Fmanage=2Ekmail-lists=2Ecom=2Fsubscriptions=2Funsubscribe=3Fa=3DRm?=
+ =?us-ascii?Q?8aND&c=3D01GYJ2S0N9CHBBPJK4HFF6JFV2&k=3D0b7?=
+ =?us-ascii?Q?16eba547fb2af04a8eff0bae2a305&m=3D01JEBM2?=
+ =?us-ascii?Q?JJX5QX8DPM58C6YXBWM&r=3D3kpx8xaQ=3E?=
+X-SG-EID:
+ =?us-ascii?Q?u001=2ElIxidJz+FylJT4fFZkAmDNgs=2FPBnaIrL6ANgjMSr4YmHtb39Wj=2Fhdg=2FGK?=
+ =?us-ascii?Q?8FHnup69CY33tdh6H5K8loLzsL3dKS5PRiCup2B?=
+ =?us-ascii?Q?N455NqJFLDUTy0+0sunE3BfGOdkpbbP8RiS3zNh?=
+ =?us-ascii?Q?cAmUZfA37YQo8bvN1eaN0ZShkc9Y=2FWC6KTuMn0Y?=
+ =?us-ascii?Q?EW5XsTfTZPp+7DxY=2FhHtc0VPaB+D+frjJ78=2FUTA?=
+ =?us-ascii?Q?PIkU+wdh7xLEY6ntyGQ4iE=3D?=
+X-SG-ID:
+ =?us-ascii?Q?u001=2ESdBcvi+Evd=2FbQef8eZF3BiU3Zi1S53GtqGa3TWBmqe75yn5aYrkvkfG+Z?=
+ =?us-ascii?Q?GKrHRvqcDBlpdKT12kl=2Fs4Kqg5w0fEiEre4aJhu?=
+ =?us-ascii?Q?dDhQwM=2FPRxuBQLrCIgwTIM8Di6hhvvh6Hk=2Fc0Bb?=
+ =?us-ascii?Q?hzesxa5JtPnGk9iDT1lvWm45loOTU9d1A1FrFfY?=
+ =?us-ascii?Q?GB6Qg8j8gtnRacFYTA29ofaHxjqbPgLVeAcxs0g?=
+ =?us-ascii?Q?GjFkkLEqkA=2FFUQN4tGWylIOUsvRRghdew0zm4JV?=
+ =?us-ascii?Q?ZdDiyqoY0T6uS7mNDfP7YeATdem9whVmWmtpDyA?=
+ =?us-ascii?Q?L2y56wvZeZ0M46vTpCgw3LnhuE+N8kU294pYXGz?=
+ =?us-ascii?Q?WXbTHKa3rn0vSRo4K7ZYQ0NcC=2F0qZK04vWaE8Ov?=
+ =?us-ascii?Q?dMUbjnGOwpoDcQA?=
+To: Matthias Stevens <matthias@esign.eu>
+X-Entity-ID: u001.jVF3de4XWWIJlpWFfMd6kw==
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 9d73024c-188c-4cc7-85f3-01568b4d323c:0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PEPF0001E9BF:EE_
+DBBPR03MB7131:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c4734c8-8849-46ff-433e-08dd1543cb2c
+X-MS-Exchange-AtpMessageProperties: SA
+SL
+X-Forefront-Antispam-Report:
+ CIP:209.85.208.172;CTRY:US;LANG:en;SCL:9;SRV:BULK;IPV:NLI;SFV:SPM;H:mail-lj1-f172.google.com;PTR:mail-lj1-f172.google.com;CAT:BULK;SFS:(13230040)(29132699027)(4022899009)(43022699015)(69100299015)(12012899012)(2092899012)(1032899013)(2066899003)(8096899003)(16130700016);DIR:INB;
+X-Microsoft-Antispam:
+ BCL:6;ARA:13230040
+29132699027
+4022899009
+43022699015
+69100299015
+12012899012
+2092899012
+1032899013
+2066899003
+8096899003
+16130700016;
+X-Microsoft-Antispam-Message-Info:
+ =?utf-8?B?TWZMZmZKOUoycFdia1l2T3pGUC95K2RKdlVDTHNDeVlPMGtXRDNiWDVBcG1M?=
+ =?utf-8?B?UmZDK2tBRjZLSm5FR0NKeXJ5cTZMZmgyc3J0UUtad0h1NWJsREwwYUlDdkh2?=
+ =?utf-8?B?b0JlYkxNUmQzV1dhUk5oa1ZNUWdJTkQrQWNmN3IxOHlnWDFMZnk2TXhzS2c3?=
+ =?utf-8?B?VzY2Rk5URUZ3V3FJdEx5L3N5Z2lGT3NTM2JMS1pjWW9qTDkzWFpDZmdjelVz?=
+ =?utf-8?B?d3VjVEVvQ3hnby8vZkVobHh1Y1dpai9IalZYdGVjVklkQnY3WGZkMnBVZU1O?=
+ =?utf-8?B?NE5YYU5RbFNrYVVWbGJnYjFXWXFzV004aklDWGJ3L3hjblVkMVBRMmZtQUtx?=
+ =?utf-8?B?akJod0Job3l5QXZad2xvejRMSGZFVUh4eEEraFRLUXlJOGZRQVhtS3ZjTHVt?=
+ =?utf-8?B?RFJzZTRxRm5JTXZnTVkvU3JrVmR4UWgzUVFLb0tYK1hranRrK3p6Wk1lbWRQ?=
+ =?utf-8?B?NElCQlJ1Y1d0UXd0NGVvR09MRFdlUmhacGhNZXZOR3VlWnBmRDBXZzQ3RS83?=
+ =?utf-8?B?OFpDZnZQNzVYS0czcEpsUFVmV293TURZaWdzajVpR05pdlJwWVgzY3Q4Wngw?=
+ =?utf-8?B?bE01Um1xcHNINTlnY3o5YUYrRnA4bFYrUnlobXJvNE44UXJkSEErb1VWTE5z?=
+ =?utf-8?B?K2FJSVlYQkUzWmoxa1FxQ01OdWF5MGZCVzVMdnAzZzhZS1lGR3hMNFpkWkU5?=
+ =?utf-8?B?ZlpxNW4xaC91em9WOEh3V0x2cTUvU3VPd2ZnVFk2RDdTcUV3MEJuRVE4TS9Q?=
+ =?utf-8?B?RzhnNlpIMER4SDBVYXd3MXlualVqNjFpWDlvVTR5OTYyNkl1VnVSN1dLWHN6?=
+ =?utf-8?B?Z2NjYUpJaHlzaktiWlpYYWgwREx1bXJJVnlzMEg1NFlGZnkya3NWN214aDFD?=
+ =?utf-8?B?alpWeFRjM0Y0c2NlUk1RSTI5YXF1SWh6TWNtM0VjU3I4Z3VrWDhrY2xhazFG?=
+ =?utf-8?B?ZGdqSVNBbThNZDBaZDZhY25Pb2VzMldwbVh1SERJUTl4RkgyU0pEVnBQNGFE?=
+ =?utf-8?B?dDNmeml2K0VoTnRaOUg5ZlBnTnFsUUJhMVlmZVFTOWs4OFJMYkgxN0pOc2xU?=
+ =?utf-8?B?aHQ2a0x0ckZvVmhxWUVFYkFPUGkzYU5MWmJCMjNHWTRlbDRMMXhGSTUrcDBY?=
+ =?utf-8?B?UlpJRHdOV0llUnNFZ2pBWVVnQ2tFRDBNL2ZqaVkzZnVkQUwxUlhxSnpiKzBW?=
+ =?utf-8?B?RlRoM1dZem10OG8weU5JcVIvNnZVRGI4aEdzSy9reFdOTkdkdVE0R3Y3NG9T?=
+ =?utf-8?B?Qld3ZXpIWlI5NCsvc1VDejlNUVg2WkRPNzJyYk1FTW9wVHJ0TE9XWGdVcU8y?=
+ =?utf-8?B?cVIyMEdmQkRIQzVWZ2hISU92OGtYT1MyL0J2NXJtYlpCYzg5SUt0UWx1d1pJ?=
+ =?utf-8?B?TWY1WEpGbXBQWXVLZlZxK3B0Tm5FOVNmUDlOS0hhWEdZMHlHaGQ1d0hVTWk1?=
+ =?utf-8?B?WVFnWGt0MitzTDJTWlBNdEw1bGJQSXpxRzVDamlQeGZZL2haV0ErRTIrZEVI?=
+ =?utf-8?B?S1Z6UUVJL3A5VjZTSmRYaG1aSkQwS0ZJQVBJcHZpYzczK0loamV3b0Mrenhz?=
+ =?utf-8?B?T2VEc0s3VnlUTWVqY0FnWndOYU05N1gvYVU5eFh5RWV4Z0dxdFYzK0JmMXYr?=
+ =?utf-8?B?SkREdG41MjZNUEh1MlFOMUpWK1E0WDd0ejlTOW5IbHlVbys4V2FxUDU4SnJw?=
+ =?utf-8?B?YWFwbWh4b1JEb0ZYSTZhOHJDRnJKRGp1UFV6NlJ6N0Z3dC9wRzA1aU1oVVdO?=
+ =?utf-8?B?MkxXeXp5eXNqTmpOYXBrcjFlc1Y3dGQ0RXpCL0ZwM1hWVFVPTVlRSWh2aXdV?=
+ =?utf-8?B?cjkvalY5cGpPVzFhY21GMVdTZEhhREZObktlL3FYTWJrdlFsbHpCU0l4N0s5?=
+ =?utf-8?B?alNrZjBzN1h3d1NkZ2dzQVNkRkFoY2pYNTRxRUdqdGlFS2ZtRmFDaDA0UVdL?=
+ =?utf-8?B?dTZVbjJMdVlMdTlLL2Z6Rno4UllWVWZBRkIwaWh0bGo5VksvTXBwL2tsbTFz?=
+ =?utf-8?B?bjlySUkrTnNJbDdERi9QRmloR2FDbDBHdEtWWUsxcDdvemc4OVFTRTJKT2Mz?=
+ =?utf-8?B?ZHdzNVR3TUlTRjNDeWtpc3hWa0wvcFJMK0ppZnp0TTI3M2RiT0hIUXRFTU9l?=
+ =?utf-8?B?YWlJSkhRVWVPK0VPNDFEWktIQzVGY2wvOFZIRkNnQlpGUFFvREdwb042M1FK?=
+ =?utf-8?B?ZElNbEtvVHNVL2hJbnBGRG1WVFRNdVhQclVybjNtZUNpOXMxdTVwK0Z6ZW9E?=
+ =?utf-8?B?aXM3S3FJV1dGNUdTTm1rSXRqdTZVS3IyM1o5djR1UFc2QjI5YXM5SWorN2dM?=
+ =?utf-8?B?dm5tU3hnOVFjSTdlNUUyZTV1STZpcjFxdzZYYmVEck9uV0p1L2hzMG5FM0M4?=
+ =?utf-8?B?emNnSXp3MWlIMEdFdm9QNlhPbDFicnRTdXB3RkFMVlo4Tk5wVjFQSHc2UEZM?=
+ =?utf-8?B?NVJ4Y2VQemhTY25CYU1UMm1QN3Nzd09sS3p4NE9hUUVMZHZYNEdsd2FSWXdT?=
+ =?utf-8?B?M0hvdmZxL3dVTnV1cmh0aHJmdEJ2Yis1eEYrcit6QU94NjhpSDFFSDlqVVdN?=
+ =?utf-8?B?M0NqU2Jmc2hVMUF6ZUNFM3V0N1BBRkYvVGNiQXhCQ215NG5KWDNTQ3JTUzVi?=
+ =?utf-8?B?eEZwM3pucVFVVWFMR3czNW8xTEdUR09zUVNqUElYcS9FK3lFRk5Sc1ZORm12?=
+ =?utf-8?B?d1FqV080cUZMdUVSTzlOVlcxeW9wTTIvK0lnR3dRcGVOMWF4cHVudmdCK2hW?=
+ =?utf-8?B?bG51SjNlWXl5YnU3RTdEMFE5SjZ4UW9UNzlZaTE5YTJYaUdFc0pKdEtpNzhn?=
+ =?utf-8?B?aFdkQ2xkTjNOMzZObHFkMFRERXFvODBXZkhVbFpGZHBETGYwVi9XWHZZWjNa?=
+ =?utf-8?B?VzZMS0VZZGZ4bVNXTG04ak9zSndXZUpiNy9semVHWGFIdlhJVG5hTmU3aUlN?=
+ =?utf-8?B?MGNoUS9zcmh1VnFBOUViSm95S0lVak9qNHZ1RDhDMlI5TUhmTk16UzFoOEda?=
+ =?utf-8?B?Y3BKaVdkVFlVN2FkZEI5WHNObzVaaXBoeGROaG8zNHBBSmRLMGJhazN3bFN6?=
+ =?utf-8?B?OElrQzQwQWRJR0lZWldGb21USlcvR0pjZW5xTGRMd1pUNE51NnRKTkhXelda?=
+ =?utf-8?B?aWc1Q1drWHNTMGNkQ1RPV2VWVEFHeEQzNGttNDJHSm9zdkFWY05oTkNnV25T?=
+ =?utf-8?B?N3hvZzRhdlV6eit0L3FqQmlVS3U4aXdxaVBha2FYbjRjcHFJKzNkY3ViY1I0?=
+ =?utf-8?B?NDJUUG83RE1MZ1ZUYWhTS3k0SHBKZU50WHFnSGhYWFZtdjV6SU9KSm9BMHZO?=
+ =?utf-8?B?bWJFcjFwZW5ib0lxeTFJQ1JSM01WaGVMM3MwN2xqR3MyTkRVTFRXOVdPU3RO?=
+ =?utf-8?Q?XNl/53vIM9N+zcKbhHAdu?=

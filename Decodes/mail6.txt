@@ -1,0 +1,37 @@
+Received: from AM9PR03MB6868.eurprd03.prod.outlook.com (2603:10a6:20b:2d6::10)
+ by AM6PR03MB4744.eurprd03.prod.outlook.com with HTTPS; Mon, 16 Dec 2024
+ 07:26:37 +0000
+Received: from AS4PR03MB8177.eurprd03.prod.outlook.com (2603:10a6:20b:4e0::20)
+ by AM9PR03MB6868.eurprd03.prod.outlook.com (2603:10a6:20b:2d6::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.22; Mon, 16 Dec
+ 2024 07:26:36 +0000
+Received: from AS4PR03MB8177.eurprd03.prod.outlook.com
+ ([fe80::8e3f:b7f5:1759:592c]) by AS4PR03MB8177.eurprd03.prod.outlook.com
+ ([fe80::8e3f:b7f5:1759:592c%5]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
+ 07:26:36 +0000
+From: Wim Garreyn <wim.garreyn@dynamate.be>
+To: Domien Van Rompaey <domien.vanrompaey@dynamate.be>, Dieter Haspeslagh
+	<dieter.haspeslagh@dynamate.be>
+Subject: Redbird/Cloudstack update
+Thread-Topic: Redbird/Cloudstack update
+Thread-Index: AdtAJHHExbjoVBsp4EWDem3Yz4ofuQ==
+Date: Mon, 16 Dec 2024 07:26:35 +0000
+Message-ID:
+ <AS4PR03MB81770A1C2509D8415997438EF53B2@AS4PR03MB8177.eurprd03.prod.outlook.com>
+Accept-Language: nl-BE, nl-NL, en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: AS4PR03MB8177.eurprd03.prod.outlook.com
+X-MS-Has-Attach:
+X-MS-Exchange-Organization-Network-Message-Id:
+ e333f7a3-a7b6-430b-9ed0-08dd1da2f93a
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+X-Microsoft-Antispam-Mailbox-Delivery:
+ ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(425001)(930097)(140003)(1420198);
+X-Microsoft-Antispam-Message-Info:
+ rxkpUtQYOJw88I3NKQX6ycDFPYuyIZNfsqbIqAHuLnNuA7AhrkGFKwrsa28aGVDM83ZKZCd+JrxL0Ii9zVm7M7adLEJ3aioBSxck0ndSGNkFGyiObvepoBSwbMlQ9OFyF2w+9Zxi45DS8fFGIXyBuTWmnsogohuUR2XRDL4o9z+uqNSyKYk5VDXVAMTwZW8lQwoQC832/K/yvHZKsRLop2RZmpBQLu+7ZTaxuAC6V7a07s37ohBLveRAS1OWi1bsEeesy2Cp0yfewaIHVckdifN5JBS+sz2Ao2syVC7Gi7WjIp7LoRsg3t2FheUlSH5ygpciLY/s6egvmKF8Dlue7fS9b+sWJyvtzmWOIdugeHjOCdZubStkTGyPPczJQIq/uMs0ksqPddNTiwU294TlHCEK6554FJZHA7hwRhLLx2v3krcoj3Y60y7Is8fVRdkCrvcv7I5O5UfHf7pk2BOogBX4YBLQVAXP9hdcg0EvrGo9sWb3j/CDHLr9zVMFw4v9108TlVSQhZF8uBKViNhDjXPlsHw07B1yVFmlFdQeLMraF6/J5FejhVyl3J2qGSkOI5j1BB4wQe7AkhQukhQh/VGAOhwX4yhrDcuanirWQDUw2dv3f2oyjKAkPn8nsWDc1hQqZxVcBVBDbGMqqW3lt6Igu6MNDXj+BLQQx8egbNB1LjLGXD1iNtPs9lf8FcnfZdU0TpwX9uxByTOKk+5xGFs1SdfSOgXPqL77MPwjWss8E5MctQXrkHI1rxm0Q9y4dDnrI8OVIatVT/yRdPJDVg9HTsmymurnc7joYl+OOZI=
+Content-Type: multipart/alternative;
+	boundary="_002_AS4PR03MB81770A1C2509D8415997438EF53B2AS4PR03MB8177eurp_"
+MIME-Version: 1.0

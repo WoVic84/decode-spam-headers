@@ -1,0 +1,951 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Decode Spam Headers</title>
+  </head>
+  <style>
+  body {
+    background-color:rgb(40, 44, 52);
+    color: rgb(220, 223, 228);
+    font-family: Consolas, monaco, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 20px;
+  }
+
+  .text-white {
+    color: rgb(220, 223, 228);
+  }
+
+  .text-grey {
+    color: rgb(132, 139, 149);
+  }
+
+  .text-red {
+    color: rgb(224, 108, 117);
+  }
+
+  .text-green {
+    color: rgb(108, 135, 94);
+  }
+
+  .text-yellow {
+    color: rgb(229, 192, 123);
+  }
+
+  .text-blue {
+    color: rgb(97, 175, 239);
+  }
+
+  .text-magenta {
+    color: rgb(198, 120, 221);
+  }  
+
+  .text-cyan {
+    color: rgb(86, 182, 194);
+  }
+
+  h1 {
+ font-family: Consolas, monaco, monospace;
+ font-size: 24px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 700;
+ line-height: 26.4px;
+ }
+
+ h3 {
+ font-family: Consolas, monaco, monospace;
+ font-size: 14px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 700;
+ line-height: 15.4px;
+ }
+
+ p {
+ font-family: Consolas, monaco, monospace;
+ font-size: 14px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 400;
+ line-height: 20px;
+ }
+
+ blockquote {
+ font-family: Consolas, monaco, monospace;
+ font-size: 14px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 400;
+ line-height: 30px;
+ }
+
+ pre {
+ font-family: Consolas, monaco, monospace;
+ font-size: 13px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 400;
+ line-height: 18.5714px;
+ }
+
+ summary::-webkit-details-marker {
+  color: #00ACF3;
+  font-size: 125%;
+  margin-right: 2px;
+}
+
+summary:focus {
+    outline-style: none;
+}
+
+article > details > summary {
+    font-size: 18px;
+    margin-top: 16px;
+}
+
+details > p {
+    margin-left: 14px;
+}
+
+blockquote code {
+    background-color: rgba(0, 0, 0, .07);
+    display: block;
+    font-family: Consolas, monaco, monospace;
+    font-size: 13px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 18.5714px;    
+}
+
+a {
+   color: rgb(108, 135, 94);
+   text-decoration: none;
+}
+
+  </style>
+  <body>
+    <div>
+        <br/>
+        <h2>
+        SMTP Headers analysis by <a href="https://github.com/mgeeky/decode-spam-headers">decode-spam-headers.py</a>
+        </h2>
+        <i style=".text-grey">(brought to you by <a style="size:8px" href="https://twitter.com/mariuszbit">@mariuszbit</a>)</i>
+        <br/>
+        <br/>
+        <br/>
+        <article>
+          <details>
+            <summary>Original SMTP Headers</summary>
+            <blockquote>
+            <code>
+Received:&nbsp;from&nbsp;AM9PR03MB7852.eurprd03.prod.outlook.com&nbsp;(2603:10a6:20b:433::17)<br/>
+&nbsp;by&nbsp;DU2PR03MB7895.eurprd03.prod.outlook.com&nbsp;with&nbsp;HTTPS;&nbsp;Mon,&nbsp;9&nbsp;Dec&nbsp;2024<br/>
+&nbsp;10:15:23&nbsp;+0000<br/>
+ARC-Seal:&nbsp;i=3;&nbsp;a=rsa-sha256;&nbsp;s=arcselector10001;&nbsp;d=microsoft.com;&nbsp;cv=pass;<br/>
+&nbsp;b=XrmTFw5H3/VoCRSY7Bg5/VpepMy+fz5IhUN/1RDYCZ4rzoAX3VU69l90HBwB9yaiu8RdtQiXCCaYjXz4SPKJ4jTuPgh61bH6O7m8LuYBPXXJuBFBsKjKIlk5XdlO7IFM9xIe4lym8/Yeokq45MilQLr7h+BWfXgBq96ZnQPl7XKFgrqZeZMU+4pEcbbHEm4eoe0TkEYdIMzvxXaBbNNaxf28r5qZZwrWPME9MnAC8Aoz1nt85eOk+gAab+BpAtu4jXq3HSLs7wiTeCJYkGuvAnFeokAgRmlUCjE089sHLGmaS92i1GaxT49nlW696068GG2M88kZaJx0ZbykSexKKQ==<br/>
+ARC-Message-Signature:&nbsp;i=3;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=microsoft.com;<br/>
+&nbsp;s=arcselector10001;<br/>
+&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;<br/>
+&nbsp;bh=KbSiTaojyOfGJxOWE4SF1Y3wH2b/L6bVG9FF7QosCYs=;<br/>
+&nbsp;b=fl3Q6N9NBLYC6pRw/A/d3Hm2Jx7LjS3haIUEafC4hqerBOZSspD/iDsnkeXx20jS1IX7wqDalnW5vDn461p9bAOumUEgKe0Z0dYaQc3eIm6GipPcNx4C3F+nbLOK9kpiOPH5Y030iHjJZym7/+Vatb2bC3EZNVM1LpyRmDO7b77rqRkfNDhsgrJZ2PpSgbfzdA/w0TMrL86mbKJO+5s6wBhoxqCcQrzSrDla7PY7VH6oKipdZwZfJzNCs8xxdnR/DMcTB/k2ydvH4yNTyOHZM3HmLHr9uCo9Olb3TrmtYTsPbpJOyY34rEwokrl+26gIUZSRrz6jd3kLlhulDQoL5g==<br/>
+ARC-Authentication-Results:&nbsp;i=3;&nbsp;mx.microsoft.com&nbsp;1;&nbsp;spf=pass&nbsp;(sender&nbsp;ip&nbsp;is<br/>
+&nbsp;209.85.208.179)&nbsp;smtp.rcpttodomain=dynamate.be&nbsp;smtp.mailfrom=esign.eu;<br/>
+&nbsp;dmarc=pass&nbsp;(p=none&nbsp;sp=none&nbsp;pct=100)&nbsp;action=none&nbsp;header.from=cyclowax.com;<br/>
+&nbsp;dkim=pass&nbsp;(signature&nbsp;was&nbsp;verified)&nbsp;header.d=cyclowax.com;&nbsp;arc=pass&nbsp;(0&nbsp;oda=1<br/>
+&nbsp;ltdi=1<br/>
+&nbsp;spf=[1,2,smtp.mailfrom=bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com]<br/>
+&nbsp;dkim=[1,2,header.i=@cyclowax.com]&nbsp;dmarc=[1,2,header.from=cyclowax.com])<br/>
+Received:&nbsp;from&nbsp;DU7PR01CA0039.eurprd01.prod.exchangelabs.com<br/>
+&nbsp;(2603:10a6:10:50e::12)&nbsp;by&nbsp;AM9PR03MB7852.eurprd03.prod.outlook.com<br/>
+&nbsp;(2603:10a6:20b:433::17)&nbsp;with&nbsp;Microsoft&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,<br/>
+&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)&nbsp;id&nbsp;15.20.8230.18;&nbsp;Mon,&nbsp;9&nbsp;Dec<br/>
+&nbsp;2024&nbsp;10:15:16&nbsp;+0000<br/>
+Received:&nbsp;from&nbsp;DB5PEPF00014B9C.eurprd02.prod.outlook.com<br/>
+&nbsp;(2603:10a6:10:50e:cafe::c8)&nbsp;by&nbsp;DU7PR01CA0039.outlook.office365.com<br/>
+&nbsp;(2603:10a6:10:50e::12)&nbsp;with&nbsp;Microsoft&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_3,<br/>
+&nbsp;cipher=TLS_AES_256_GCM_SHA384)&nbsp;id&nbsp;15.20.8230.14&nbsp;via&nbsp;Frontend&nbsp;Transport;&nbsp;Mon,<br/>
+&nbsp;9&nbsp;Dec&nbsp;2024&nbsp;10:15:16&nbsp;+0000<br/>
+Authentication-Results:&nbsp;spf=pass&nbsp;(sender&nbsp;IP&nbsp;is&nbsp;209.85.208.179)<br/>
+&nbsp;smtp.mailfrom=esign.eu;&nbsp;dkim=pass&nbsp;(signature&nbsp;was&nbsp;verified)<br/>
+&nbsp;header.d=cyclowax.com;dmarc=pass&nbsp;action=none<br/>
+&nbsp;header.from=cyclowax.com;compauth=pass&nbsp;reason=100<br/>
+Received-SPF:&nbsp;Pass&nbsp;(protection.outlook.com:&nbsp;domain&nbsp;of&nbsp;esign.eu&nbsp;designates<br/>
+&nbsp;209.85.208.179&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;receiver=protection.outlook.com;<br/>
+&nbsp;client-ip=209.85.208.179;&nbsp;helo=mail-lj1-f179.google.com;&nbsp;pr=C<br/>
+Received:&nbsp;from&nbsp;mail-lj1-f179.google.com&nbsp;(209.85.208.179)&nbsp;by<br/>
+&nbsp;DB5PEPF00014B9C.mail.protection.outlook.com&nbsp;(10.167.8.170)&nbsp;with&nbsp;Microsoft<br/>
+&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_3,&nbsp;cipher=TLS_AES_256_GCM_SHA384)&nbsp;id&nbsp;15.20.8230.7<br/>
+&nbsp;via&nbsp;Frontend&nbsp;Transport;&nbsp;Mon,&nbsp;9&nbsp;Dec&nbsp;2024&nbsp;10:15:14&nbsp;+0000<br/>
+Received:&nbsp;by&nbsp;mail-lj1-f179.google.com&nbsp;with&nbsp;SMTP&nbsp;id&nbsp;38308e7fff4ca-30225b2586cso5616201fa.0<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;<matthias.stevens@dynamate.be>;&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;02:15:14&nbsp;-0800&nbsp;(PST)<br/>
+ARC-Seal:&nbsp;i=2;&nbsp;a=rsa-sha256;&nbsp;t=1733739314;&nbsp;cv=pass;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d=google.com;&nbsp;s=arc-20240605;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b=X8pNXJc2izJ4daWbQ+q77ovpQh/RWjgh4RbCK05ZthD7VJLuMwXosMq8lejuziwCW4<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/C0tB8bDu8UMmYFDIcn+0ndjO5nx7Z0W3+xLtdGz1kb9uk3Xd6VuIh1oKftLi2IcCCsG<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BPYAg3b445rJrSHtJGXMVx2rjqaKeSh3b+IYBQqAusjR09esQCbO+yBbNsKRaZw2XYnH<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fG+xr++sWHQ7mkEemjb/aQLGZifdChYzpT8DFh4VN3uzahEkyAaf5YR6rO8g6GkjNbQJ<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gnm9SOM8WCrDDEfTkjsWye1V0vdjQrHxD+nohrEb8Ciordbs6NPRUZc+5MUFq92drInj<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0weg==<br/>
+ARC-Message-Signature:&nbsp;i=2;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=google.com;&nbsp;s=arc-20240605;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:mime-version:from:date:dkim-signature:delivered-to;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bh=KbSiTaojyOfGJxOWE4SF1Y3wH2b/L6bVG9FF7QosCYs=;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fh=cLj362g6jwm598bP4Pc40eKoclMc17/YmUfrm5gp3ic=;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b=Gn22Pk+lQNsTpd4T3C4DZ8G8fosaXN9yw90Onqwe3+aK04C59+8Dc+0R6XxWS9DT+M<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IbUKsh/yfG7Y39EISRvzIfsfX4Tikf81H/RyKd3F1WLH/Lu9jN2Ycs4m9KB7PAPUBmDN<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1awYDOlSKxVY9JVhabxByh0SewvGx9sk/S5Q1w/0S7CqUYcZ/nuD2eYdoDxhJC187Hyr<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aesZxez3eCLfJ0OZeeu+IytdwmSbU+r7GecmsbfRMw66o5LzBo9RUcwhRi5AlCPpXudf<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nij4g5lcxc+R63mY6MDXOf9WM0VnJdXl9fU9BEsgqZPx95ZkaMaWzqSIfpz3odlxTyXP<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kJnQ==;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;darn=dynamate.be<br/>
+ARC-Authentication-Results:&nbsp;i=2;&nbsp;mx.google.com;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dkim=pass&nbsp;header.i=@cyclowax.com&nbsp;header.s=kl&nbsp;header.b=UX9dnTg+;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spf=pass&nbsp;(google.com:&nbsp;domain&nbsp;of&nbsp;bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com&nbsp;designates&nbsp;167.89.72.21&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;smtp.mailfrom="bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com";<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dmarc=pass&nbsp;(p=NONE&nbsp;sp=NONE&nbsp;dis=NONE)&nbsp;header.from=cyclowax.com<br/>
+X-Google-DKIM-Signature:&nbsp;v=1;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d=1e100.net;&nbsp;s=20230601;&nbsp;t=1733739314;&nbsp;x=1734344114;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:mime-version:from:date:dkim-signature:delivered-to:x-forwarded-for<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:x-forwarded-to:x-gm-message-state:from:to:cc:subject:date<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:message-id:reply-to;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bh=KbSiTaojyOfGJxOWE4SF1Y3wH2b/L6bVG9FF7QosCYs=;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b=V0hgMHVqPMYXO9mNoDLKYvE3h+ilw+qmXVLgThTAar4kFIYlKGEoPFD8Kqap2g6Q6S<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jGe1cHaJspSfWAzBVKrH4bgQPj5pwPrbPZ0P0ZPwQtX/hI20bqRH5em7WMkXbcdFi0aq<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aXPQUnOhiQ4aWawV2kGcjmtKKIkjxd6fPnMrqiSPyLyQWmuLaJzgo/RZzEdH88L7OrFT<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kZdzIJDWWrPWWr3dIQ/uYD2gsjj2IE87O2DmKjAjMbn5+d5Ruzn6lwshBAtBmEm5ZICl<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;qAVcfCMEs4kA+v0LZmkAm5lNwRzL5zg7dN7OvExyp3LlvAO3g0WEKakrZwHh5zYeqsrp<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HITg==<br/>
+X-Forwarded-Encrypted:&nbsp;i=2;&nbsp;AJvYcCXE2UzRSR98eX7NhZW39QXi8XUCTgpqtXyGlUfKByluBofcR554zj8RHAB3tU8ofmvU+GOq2dQuM0tpFAIePW8r@dynamate.be<br/>
+X-Gm-Message-State:&nbsp;AOJu0YyFRBs32CMQqccgxQnka5YN/n+f5LcKrnUWBSWAz/bR9EIUen0L<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;U0nO99L4V00wisegvmk/zDqIJpOXE/gW/OCXKwWv2BfC/O58QTWRwMU8jVcB1vypnsCuyC/OXDZ<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;BInZkzsz+MDK7rRCA5hBbc2OF6QvWN9PQB54cQQv5o1bMwNsR8lifwSWtw5+vMBhwfq4+qEPrZJ<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;gZVuI=<br/>
+X-Received:&nbsp;by&nbsp;2002:a2e:b887:0:b0:2fa:c185:ac4e&nbsp;with&nbsp;SMTP&nbsp;id&nbsp;38308e7fff4ca-3001eb748d0mr46784241fa.13.1733739313943;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;02:15:13&nbsp;-0800&nbsp;(PST)<br/>
+X-Forwarded-To:&nbsp;matthias.stevens@dynamate.be<br/>
+X-Forwarded-For:&nbsp;matthias@esign.eu&nbsp;matthias.stevens@dynamate.be<br/>
+Delivered-To:&nbsp;matthias@esign.eu<br/>
+Received:&nbsp;by&nbsp;2002:a05:651c:410c:b0:300:366e:4957&nbsp;with&nbsp;SMTP&nbsp;id&nbsp;12csp1594577lju;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mon,&nbsp;9&nbsp;Dec&nbsp;2024&nbsp;02:15:11&nbsp;-0800&nbsp;(PST)<br/>
+X-Google-Smtp-Source:&nbsp;AGHT+IGu8FKz5p2j9opwiDu1ZenELidzq5hzNFFDRlqv4VEa5xhTMXy9QTmQ1e5zk4O6A6lqP9zq<br/>
+X-Received:&nbsp;by&nbsp;2002:a05:620a:4897:b0:7b6:c92e:2e6d&nbsp;with&nbsp;SMTP&nbsp;id&nbsp;af79cd13be357-7b6c92e2f11mr992998785a.52.1733739310708;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;02:15:10&nbsp;-0800&nbsp;(PST)<br/>
+ARC-Seal:&nbsp;i=1;&nbsp;a=rsa-sha256;&nbsp;t=1733739310;&nbsp;cv=none;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d=google.com;&nbsp;s=arc-20240605;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b=afClJRM4lxFxGc/zIIQdsHj2qxrknXez30zkUGsBPaODBs58f9CFNhyLST4ZsKe5Im<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BKcbEMZcjloMI9Tky9dQWvDzQGLvvj3MLS+HEkADWxAzBxzbccW9kKCGG9i08FeISuBa<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lWGHXcP0xm4OUHS9z9jbkES0fo0SuUJ/1DxhbOVa12ZyNZFiJhJdcoN46qTEdtYJ4rRx<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ah8NyavX2Ir2o1l1MDBZQtobKQ6e7Grs4yPfVfjGxO9Al2f2gdcgykpP3sZ6gqCe3BQG<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+JVZ5Gti2kOp2YRuunt2EePOmLXKze13/uk8A5Hwpda7QNQWkg3QQbi9Rk8Vl67dSR4r<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0/Zg==<br/>
+ARC-Message-Signature:&nbsp;i=1;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=google.com;&nbsp;s=arc-20240605;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:mime-version:from:date:dkim-signature;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bh=KbSiTaojyOfGJxOWE4SF1Y3wH2b/L6bVG9FF7QosCYs=;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fh=caNR/YRUhfferXcZwyNQZyI1RI34QOu5tDIw1g7aUNU=;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b=hbH6aGvD7iJXW6Sr5leHyoiPF4iCrbO0Y0V/zuzvReK5xGgMeskQST/bsyS9OUaQja<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wjOFmLaLfHeZ++Yv1nQVE29w6Icuk3/dUUrdIFghFP50QznXuU0UkGGG+yBtohAvpwfF<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5by6b47mbaTjhbkMW9YW7Uw5+CpukXJzV4NE9J9HKd/5Y3oAcag3o9WsHvWXe8fL3k/v<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9NsSKJ712bPNDYuA/lSxLsfCKzbvMuQr24mEmYDaTefMVRMNZs+c4XX07F0mBm5rXLFi<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2AalGEIBFEoMJ8ztgwZ5XMhGMuNmRMT+Qh+yOQ3V3VBn1k7oYB4xZK6wgsdfIL0M/DKj<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Q7Dw==;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dara=google.com<br/>
+ARC-Authentication-Results:&nbsp;i=1;&nbsp;mx.google.com;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dkim=pass&nbsp;header.i=@cyclowax.com&nbsp;header.s=kl&nbsp;header.b=UX9dnTg+;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spf=pass&nbsp;(google.com:&nbsp;domain&nbsp;of&nbsp;bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com&nbsp;designates&nbsp;167.89.72.21&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;smtp.mailfrom="bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com";<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dmarc=pass&nbsp;(p=NONE&nbsp;sp=NONE&nbsp;dis=NONE)&nbsp;header.from=cyclowax.com<br/>
+Return-Path:&nbsp;matthias+caf_=matthias.stevens=dynamate.be@esign.eu<br/>
+Received:&nbsp;from&nbsp;o1279.shared.klaviyomail.com&nbsp;(o1279.shared.klaviyomail.com.&nbsp;[167.89.72.21])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;mx.google.com&nbsp;with&nbsp;ESMTPS&nbsp;id&nbsp;af79cd13be357-7b6c48200e8si636047385a.21.2024.12.09.02.15.10<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;<matthias@esign.eu><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(version=TLS1_3&nbsp;cipher=TLS_AES_128_GCM_SHA256&nbsp;bits=128/128);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;02:15:10&nbsp;-0800&nbsp;(PST)<br/>
+Received-SPF:&nbsp;pass&nbsp;(google.com:&nbsp;domain&nbsp;of&nbsp;bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com&nbsp;designates&nbsp;167.89.72.21&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;client-ip=167.89.72.21;<br/>
+Authentication-Results-Original:&nbsp;mx.google.com;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dkim=pass<br/>
+&nbsp;header.i=@cyclowax.com&nbsp;header.s=kl&nbsp;header.b=UX9dnTg+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spf=pass<br/>
+&nbsp;(google.com:&nbsp;domain&nbsp;of<br/>
+&nbsp;bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com&nbsp;designates<br/>
+&nbsp;167.89.72.21&nbsp;as&nbsp;permitted&nbsp;sender)<br/>
+&nbsp;smtp.mailfrom="bounces+34062868-afdd-matthias=esign.eu@email.cyclowax.com";<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dmarc=pass&nbsp;(p=NONE&nbsp;sp=NONE&nbsp;dis=NONE)&nbsp;header.from=cyclowax.com<br/>
+DKIM-Signature:&nbsp;v=1;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=cyclowax.com;<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;h=content-type:from:mime-version:subject:list-unsubscribe-post:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;list-unsubscribe:to:cc:content-type:from:subject:to;<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;s=kl;&nbsp;bh=KbSiTaojyOfGJxOWE4SF1Y3wH2b/L6bVG9FF7QosCYs=;<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;b=UX9dnTg+2kIVskVy+ZouihZi9p3w8JALLbI+g6nRAa+7NH22ccMD+8CXxHrpU2id5KX/<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;J5sBbbnVjUefHsrkSjzbFnM6gHWmOIjioBddG6ugg6T1cPyWgnWRjK8d6JIVwnpr0FSEiI<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;JCQUtdrKtf6PXuVoemCqZLG+r4qGkmmeDhGfAyT8dXPL9XXSSJ5T4Dnnjhy/e714Bdtq+C<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;k1i+6z5nxb94GfZgE6V/c7QplnizHvgTgYWNt8pVG892vfc8+wEq5li/lklBweKQNkCi//<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;FOzPxAXoxSWik6PIH3cL4fv5A4rnfTMZaZjrQ5x5X+9d8wBbMxkfBjCiAYbKzyzA==<br/>
+Received:&nbsp;by&nbsp;recvd-69cbc48b94-5zxfq&nbsp;with&nbsp;SMTP&nbsp;id&nbsp;recvd-69cbc48b94-5zxfq-1-6756C32D-43<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;2024-12-09&nbsp;10:15:09.909283452&nbsp;+0000&nbsp;UTC&nbsp;m=+2119898.429346110<br/>
+Received:&nbsp;from&nbsp;MzQwNjI4Njg&nbsp;(unknown)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;geopod-ismtpd-0&nbsp;(SG)&nbsp;with&nbsp;HTTP<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;id&nbsp;pb7GeLWZRUK4LSzn9nYnzA<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:09.903&nbsp;+0000&nbsp;(UTC)<br/>
+Content-Type:&nbsp;multipart/alternative;&nbsp;boundary=172f4bce4cc988469428b2f018e73a75a0b04ecfef2d5e134e8bc9b01da3<br/>
+Date:&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:09&nbsp;+0000&nbsp;(UTC)<br/>
+From:&nbsp;Cyclowax&nbsp;<hello@cyclowax.com><br/>
+Mime-Version:&nbsp;1.0<br/>
+Message-ID:&nbsp;<pb7GeLWZRUK4LSzn9nYnzA@geopod-ismtpd-0><br/>
+Subject:&nbsp;Ho-Ho-Hot&nbsp;Wax&nbsp;=?UTF-8?B?8J+OhA==?=<br/>
+X-Kmail-Account:&nbsp;XTkQCR<br/>
+X-Kmail-Message:&nbsp;01JEN8C71GGD0KHN85FQ6R64T6<br/>
+List-Unsubscribe-Post:&nbsp;List-Unsubscribe=One-Click<br/>
+List-Unsubscribe:<br/>
+&nbsp;=?us-ascii?Q?=3Chttps=3A=2F=2Fmanage=2Ekmail-lists=2Ecom=2Fsubscriptions=2Funsubscribe=3Fa=3DXT?=<br/>
+&nbsp;=?us-ascii?Q?kQCR&c=3D01GZC7PQ3VWDVJSK3TMN47MJ6N&k=3Da4f?=<br/>
+&nbsp;=?us-ascii?Q?8310419f8dc3de1e2586ebb98a78f&m=3D01JEN8C?=<br/>
+&nbsp;=?us-ascii?Q?71GGD0KHN85FQ6R64T6&r=3D3kfzQxQL=3E?=<br/>
+X-Kmail-Ops:&nbsp;01GZC7PQ3VWDVJSK3TMN47MJ6N<br/>
+X-Report-Abuse:&nbsp;Please&nbsp;report&nbsp;any&nbsp;spam&nbsp;or&nbsp;abuse&nbsp;to:&nbsp;abuse@klaviyo.com<br/>
+X-SG-EID:<br/>
+&nbsp;=?us-ascii?Q?u001=2ESNJDheVJO0robPXWjj4mbyxs0BzRfHOlT5YQQfsf9DUxxBgPkcKAFwcmE?=<br/>
+&nbsp;=?us-ascii?Q?NrLKhdjpQi58wzmFeFVhtSt9QzeBcQdI99M0KBx?=<br/>
+&nbsp;=?us-ascii?Q?3E3MBBZfAM3neLuWbN0Xb7lmvUtt9sBNQCSrALB?=<br/>
+&nbsp;=?us-ascii?Q?VEXvI2rExiOMYAVVE24dfLUsb2tZDZN4zjsHkOJ?=<br/>
+&nbsp;=?us-ascii?Q?4HZkeBdTpYb4by+vGUMIbES=2FT9Iid6aWEqQJ=2FVp?=<br/>
+&nbsp;=?us-ascii?Q?FZ7NDY5mTil1VV+EqP0ALU=3D?=<br/>
+X-SG-ID:<br/>
+&nbsp;=?us-ascii?Q?u001=2ESdBcvi+Evd=2FbQef8eZF3BiU3Zi1S53GtqGa3TWBmqe75yn5aYrkvkfG+Z?=<br/>
+&nbsp;=?us-ascii?Q?GKrHRvq+sHL5MDEDZod8nwRGpQFZ+M7yh1QfJ0m?=<br/>
+&nbsp;=?us-ascii?Q?9js7gCAgif5q36g2nuWjTw6KRscNLajlcvbqEzW?=<br/>
+&nbsp;=?us-ascii?Q?3sbA7lE2RA=2F1lVq57d8HU7PMksq=2FzSDjQlut6Lv?=<br/>
+&nbsp;=?us-ascii?Q?Dvhm3kc1eLG1avAJCayLOrwTBPUa85lqOSdeuPc?=<br/>
+&nbsp;=?us-ascii?Q?+zI0wkOSHyWiiUxhH5e9f7Omjuyw7Y0ZDojNqkG?=<br/>
+&nbsp;=?us-ascii?Q?YaVmMYSVnwQ46swftbNEn9vDvVTUFgjEQOLE7F9?=<br/>
+&nbsp;=?us-ascii?Q?eBfADnCIzKD4+jmtbhYgEdDflcefxvr=2FyMwL7GP?=<br/>
+&nbsp;=?us-ascii?Q?wHlWsPwianFq9CaUpb2S1hHYPHjeSZUjYEbN4Ro?=<br/>
+&nbsp;=?us-ascii?Q?5C+ovaKMz6QLTIy?=<br/>
+To:&nbsp;Matthias&nbsp;Stevens&nbsp;<matthias@esign.eu><br/>
+X-Entity-ID:&nbsp;u001.acEERmkdcohWk7Vj1t02Tg==<br/>
+X-MS-Exchange-Organization-ExpirationStartTime:&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:14.9148<br/>
+&nbsp;(UTC)<br/>
+X-MS-Exchange-Organization-ExpirationStartTimeReason:&nbsp;OriginalSubmit<br/>
+X-MS-Exchange-Organization-ExpirationInterval:&nbsp;1:00:00:00.0000000<br/>
+X-MS-Exchange-Organization-ExpirationIntervalReason:&nbsp;OriginalSubmit<br/>
+X-MS-Exchange-Organization-Network-Message-Id:<br/>
+&nbsp;b416b480-9e78-4615-fdc3-08dd183a5fb1<br/>
+X-EOPAttributedMessage:&nbsp;0<br/>
+X-EOPTenantAttributedMessage:&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c:0<br/>
+X-MS-Exchange-Organization-MessageDirectionality:&nbsp;Incoming<br/>
+X-MS-PublicTrafficType:&nbsp;Email<br/>
+X-MS-TrafficTypeDiagnostic:<br/>
+&nbsp;DB5PEPF00014B9C:EE_|AM9PR03MB7852:EE_|DU2PR03MB7895:EE_<br/>
+X-MS-Exchange-Organization-AuthSource:<br/>
+&nbsp;DB5PEPF00014B9C.eurprd02.prod.outlook.com<br/>
+X-MS-Exchange-Organization-AuthAs:&nbsp;Anonymous<br/>
+X-MS-Office365-Filtering-Correlation-Id:&nbsp;b416b480-9e78-4615-fdc3-08dd183a5fb1<br/>
+X-MS-Exchange-AtpMessageProperties:&nbsp;SA|SL<br/>
+X-MS-Exchange-Organization-SCL:&nbsp;1<br/>
+X-Microsoft-Antispam:<br/>
+&nbsp;BCL:0;ARA:13230040|1032899013|69100299015|12012899012|43022699015|4022899009|29132699027|2066899003|4076899003|8096899003;<br/>
+X-Forefront-Antispam-Report:<br/>
+&nbsp;CIP:209.85.208.179;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail-lj1-f179.google.com;PTR:mail-lj1-f179.google.com;CAT:NONE;SFS:(13230040)(1032899013)(69100299015)(12012899012)(43022699015)(4022899009)(29132699027)(2066899003)(4076899003)(8096899003);DIR:INB;<br/>
+X-MS-Exchange-CrossTenant-OriginalArrivalTime:&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:14.8992<br/>
+&nbsp;(UTC)<br/>
+X-MS-Exchange-CrossTenant-Network-Message-Id:&nbsp;b416b480-9e78-4615-fdc3-08dd183a5fb1<br/>
+X-MS-Exchange-CrossTenant-Id:&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c<br/>
+X-MS-Exchange-CrossTenant-AuthSource:<br/>
+&nbsp;DB5PEPF00014B9C.eurprd02.prod.outlook.com<br/>
+X-MS-Exchange-CrossTenant-AuthAs:&nbsp;Anonymous<br/>
+X-MS-Exchange-CrossTenant-FromEntityHeader:&nbsp;Internet<br/>
+X-MS-Exchange-Transport-CrossTenantHeadersStamped:&nbsp;AM9PR03MB7852<br/>
+X-MS-Exchange-Transport-EndToEndLatency:&nbsp;00:00:08.8825731<br/>
+X-MS-Exchange-Processed-By-BccFoldering:&nbsp;15.20.8230.010<br/>
+X-Microsoft-Antispam-Mailbox-Delivery:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(930097)(140003)(1420198);<br/>
+X-Microsoft-Antispam-Message-Info:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?kO17CfoU57G+BjsIWM0nGZJe2VDi8U3vLPc+dmBgRPOo3Qpg5cCbV/cEy5Kx?=<br/>
+&nbsp;=?us-ascii?Q?vz1jWsycKcgdFwBPs0BvDPdj6KlZSm52c2vGNmr83FmvUuSnB1jDHLGepLsA?=<br/>
+&nbsp;=?us-ascii?Q?s0BNzx0/4Xxdg0ScynPH+1e6eu3lC19cZ2R9Hrb3AktECDFxXDy8pPQdhw3i?=<br/>
+&nbsp;=?us-ascii?Q?bOyFXppmQpF89vsQKEhq/Z6qC12kd/SPR6WSuYg48gvdmzz+Gp7taQVhfzpN?=<br/>
+&nbsp;=?us-ascii?Q?B4EWjxjLytPdmmhcOPWUQh/79OVhOIAahwsA7VzQGntrV/YlnmLA4gz4YPhf?=<br/>
+&nbsp;=?us-ascii?Q?0FK2WDXVtsaWniTqpHVETf/VbtECKqxayPnsMDIcd4ZYQY+oWO2p8++PdQsd?=<br/>
+&nbsp;=?us-ascii?Q?+3k17RtHOJbXY+I5fzL0pb9SUlikrrgCWkvtAqLGon8qDc7Pu0Xj80/fvMYO?=<br/>
+&nbsp;=?us-ascii?Q?Im3fT7xGNojEZ9zD5/+0JLPHhLubqbOKJiWupiy0ApS8z8eMORYx3rfqXDrF?=<br/>
+&nbsp;=?us-ascii?Q?fwIKtrECxYqHymwqjXRRE3CjZkUWEqAhfa/p4jbr2fxTIiW+I0p+317nyIfa?=<br/>
+&nbsp;=?us-ascii?Q?trD+kL4Cg2Ea8V5YHV01KU6J60pn4LHIkyEf8gUVtoZ+BI0bCXBWOtxFzgfw?=<br/>
+&nbsp;=?us-ascii?Q?sB1og75bjgUlznqYKCQfWMHIHQk0jgOq1EweUVzKaK36Z+QjsENAn0UQh5Gp?=<br/>
+&nbsp;=?us-ascii?Q?018z8ADJxJzFSZ22p4vt99KI07pTzrIjQ7ntHjQQ+B9yZ7wrG8P2GrJylOp7?=<br/>
+&nbsp;=?us-ascii?Q?fJAnARVgdWNg8Q/SM5HTZPEMX0W8HNZuczZrecO/eoxvsJYL04weVJzsnIv/?=<br/>
+&nbsp;=?us-ascii?Q?EtDKWx/EvUmk8X8ZNTgQnZe0QA0zcIefdiEGeBy+PJzvbNfM1OOBVH20TMSR?=<br/>
+&nbsp;=?us-ascii?Q?CVULsOdWkslXxd0DBj5Rx72hehG/O9XjHJ1O8ag+5Mnef7cvZ/3/mi3rJAsT?=<br/>
+&nbsp;=?us-ascii?Q?oDbHlGdwmExs9sVqbCjsHrz+zCQ5qHn6Ynz0EAOTw4QPomJHw2YD3QB+jGY5?=<br/>
+&nbsp;=?us-ascii?Q?XTCAk5NtelZ67F0G86i8On3Sw47BVH1Ryrw33682EHYHZjHq++CTeGJwa6nx?=<br/>
+&nbsp;=?us-ascii?Q?+va5LCoKbR6Yfa3o+zOIkN2yew9nDxZqxh3ydW1JYXFvnhCZQfaePOlnPqwa?=<br/>
+&nbsp;=?us-ascii?Q?YcLM7Hi0HG9IYjRVhLqhsFbCBuYJ5IqdNXIVaxXHr2Y+NChh1//oNoFzY7XB?=<br/>
+&nbsp;=?us-ascii?Q?b1dU5OWX9GIOs05BelS7NjxgmFrdCnPpPbRDTVnBIG4T7WYx5Y0KuSoaokUq?=<br/>
+&nbsp;=?us-ascii?Q?AMhLrV+nVymfmMlRCQtSISFOqkf6IU3eNiXjzBl/zIVNsK5fqEtuXl9ODTF8?=<br/>
+&nbsp;=?us-ascii?Q?tr2Ba/wfKjhxc27Fv62kZ6erUBsyYSE/es0trHBgN2oxuUjS96kv8FuGZ+sr?=<br/>
+&nbsp;=?us-ascii?Q?f3e4g381aULxp7aSQioTZ7Pclmf+DgxY27kXJXIyfmJh4tvdty5MU+julA2t?=<br/>
+&nbsp;=?us-ascii?Q?fgeJCgTAmjUMHn+DAFBR+jK8RkkJlZUDlagjkzK6eDmm8wG6ecdqUcMpKa7L?=<br/>
+&nbsp;=?us-ascii?Q?KX7R2T5eaq2oWM1r++JhnLbBQ46UlZPSqFrl0uShFuDxu0H/8OkzYtFe3VDJ?=<br/>
+&nbsp;=?us-ascii?Q?Otd45ZhOpc/eXIOGzJaAwWpB4zkWyUHEodooz7TZR2egW9doVcryDiCRB7wH?=<br/>
+&nbsp;=?us-ascii?Q?S9qfyIRnr5YkT0eFbx+NJ3gp2vgUa0BVXztByPJ8t+9jU8Ub6yyLNNSKjIog?=<br/>
+&nbsp;=?us-ascii?Q?4V+6NI/EsSVQW9R4xLtXrHsKpBQv6AyD2lNOtyQoJnRB0s+9Y2bONwLx+qtN?=<br/>
+&nbsp;=?us-ascii?Q?vmEmcnwvdGqbGrkK6oRMpoMTm0wX8KRlzDKGw4H9V66nmvMgpEqlL9DcZv4q?=<br/>
+&nbsp;=?us-ascii?Q?H1zLDHDVsB4jFeoC5FUE0Up9LnGaFFLBRHlZCRbvuMvCRZTEojGBQnSlYYqT?=<br/>
+&nbsp;=?us-ascii?Q?H6lSgeWw0QjJNsHShr7aPPZADZ9xDYtQ8IACrPUfdAXBx098wIyhKk1qQRyT?=<br/>
+&nbsp;=?us-ascii?Q?k40rpwvrlXXYPqGpdqF9JXJLAbWsc9/QIpoVQ7Kb4vRscKCuC9dMBspbVcXL?=<br/>
+&nbsp;=?us-ascii?Q?9C31icfv3cMzOV/OlUHDCwi2oKBkFRpFFWnu6gIxy1tXlaFMB9j1Hsnp2KmZ?=<br/>
+&nbsp;=?us-ascii?Q?+TOxuZVAedgdtqYjUQ3nVSn0eVQqi2kqDUibBUw9vFxMZjWoyGFLpMFSG7Eb?=<br/>
+&nbsp;=?us-ascii?Q?eduqcAzE78GWrBiTg1ez5Yb3tyVdig=3D=3D?=
+            </code>
+            </blockquote>
+          </details>
+        </article>
+        <br/>
+    </div>
+    <br/>
+<div><hr/><br/>
+(1)&nbsp;Test:&nbsp;<font class="text-cyan">Received&nbsp;-&nbsp;Mail&nbsp;Servers&nbsp;Flow</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+Internal&nbsp;script&nbsp;error.&nbsp;Use&nbsp;--debug&nbsp;to&nbsp;find&nbsp;out&nbsp;more&nbsp;what&nbsp;happened.<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(2)&nbsp;Test:&nbsp;<font class="text-cyan">Extracted&nbsp;IP&nbsp;addresses</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Extracted&nbsp;IP&nbsp;addresses&nbsp;from&nbsp;headers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">209.85.208.179</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">10.167.8.170</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">167.89.72.21</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">024.12.09.02</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(3)&nbsp;Test:&nbsp;<font class="text-cyan">Extracted&nbsp;Domains</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Extracted&nbsp;domains&nbsp;from&nbsp;headers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">14.9148</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8230.010</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">smtp.rcpttodomain</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">google.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">167.89.72.21</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">af79cd13be357-7b6c92e2f11mr992998785a.52.1733739310708</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">09.909283452</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">00.0000000</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">DU2PR03MB7895.eurprd03.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">o1279.shared.klaviyomail.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8230</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8230.18</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">14.8992</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8230.14</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">af79cd13be357-7b6c48200e8si636047385a.21.2024.12.09.02.15.10</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">DB5PEPF00014B9C.eurprd02.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">AM9PR03MB7852.eurprd03.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">u001.acEERmkdcohWk7Vj1t02Tg</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">DU7PR01CA0039.outlook.<font class="text-red">office365&lt;/font&gt;.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">1e100.net</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">email.cyclowax.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">2119898.429346110</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">09.903</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow"><font class="text-red">microsoft&lt;/font&gt;.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">38308e7fff4ca-3001eb748d0mr46784241fa.13.1733739313943</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">209.85.208.179</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">cyclowax.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">DU7PR01CA0039.eurprd01.prod.<font class="text-red">exchange&lt;/font&gt;labs.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">mx.<font class="text-red">microsoft&lt;/font&gt;.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">mx.google.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">DB5PEPF00014B9C.mail.protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">10.167.8.170</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">klaviyo.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">mail-lj1-f179.google.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">08.8825731</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(4)&nbsp;Test:&nbsp;<font class="text-cyan">Received-SPF</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Received-SPF<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Pass&nbsp;(protection.outlook.com:&nbsp;domain&nbsp;of&nbsp;esign.eu&nbsp;designates&nbsp;209.85.208.179&nbsp;as&nbsp;permitted&nbsp;sender)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;receiver=protection.outlook.com;&nbsp;client-ip=209.85.208.179;&nbsp;helo=mail-lj1-f179.google.com;&nbsp;pr=C<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Decomposition:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Pass&nbsp;(protection.outlook.com:&nbsp;domain&nbsp;of&nbsp;esign.eu&nbsp;designates&nbsp;209.85.208.179&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;receiver:&nbsp;<font class="text-yellow">protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">client-ip</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<font class="text-green">209.85.208.179</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;helo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<font class="text-yellow">mail-lj1-f179.google.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;pr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<font class="text-yellow">C</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(5)&nbsp;Test:&nbsp;<font class="text-cyan">X-Forefront-Antispam-Report</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Forefront-Antispam-Report<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;CIP:209.85.208.179;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail-lj1-f179.google.com;PTR:mail-<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;lj1-<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f179.google.com;CAT:NONE;SFS:(13230040)(1032899013)(69100299015)(12012899012)(43022699015)(4022<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;899009)(29132699027)(2066899003)(4076899003)(8096899003);DIR:INB;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Microsoft&nbsp;Office365/Exchange&nbsp;ForeFront&nbsp;Anti-Spam&nbsp;report<br/>
+<br/>
+-&nbsp;<font class="text-magenta">CIP</font>:&nbsp;Connecting&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">209.85.208.179</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">CTRY</font>:&nbsp;The&nbsp;source&nbsp;country&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;connecting&nbsp;IP&nbsp;address<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;US<br/>
+<br/>
+-&nbsp;<font class="text-magenta">LANG</font>:&nbsp;The&nbsp;language&nbsp;in&nbsp;which&nbsp;the&nbsp;message&nbsp;was&nbsp;written<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;en<br/>
+<br/>
+-&nbsp;<font class="text-magenta">IPV</font>:&nbsp;Ingress&nbsp;Peer&nbsp;Verification&nbsp;status<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NLI:&nbsp;The&nbsp;IP&nbsp;address&nbsp;was&nbsp;not&nbsp;found&nbsp;on&nbsp;any&nbsp;IP&nbsp;reputation&nbsp;list.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SFV</font>:&nbsp;Message&nbsp;Filtering<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NSPM:&nbsp;<font class="text-green">Spam&nbsp;filtering&nbsp;marked&nbsp;the&nbsp;message&nbsp;as&nbsp;non-spam&nbsp;and&nbsp;the&nbsp;message&nbsp;was&nbsp;sent&nbsp;to&nbsp;the&nbsp;intended&nbsp;recipients.</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">H</font>:&nbsp;The&nbsp;HELO&nbsp;or&nbsp;EHLO&nbsp;string&nbsp;of&nbsp;the&nbsp;connecting&nbsp;email&nbsp;server.<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;mail-lj1-f179.google.com<br/>
+<br/>
+-&nbsp;<font class="text-magenta">PTR</font>:&nbsp;Reverse&nbsp;DNS&nbsp;of&nbsp;the&nbsp;Connecting&nbsp;IP&nbsp;peer's&nbsp;address<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;mail-lj1-f179.google.com<br/>
+<br/>
+-&nbsp;<font class="text-magenta">CAT</font>:&nbsp;The&nbsp;category&nbsp;of&nbsp;protection&nbsp;policy<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NONE:&nbsp;<font class="text-green">Clean&nbsp;message</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">DIR</font>:&nbsp;Direction&nbsp;of&nbsp;email&nbsp;verification<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;INB:&nbsp;Inbound&nbsp;email&nbsp;verification<br/>
+<br/>
+-&nbsp;Message&nbsp;matched&nbsp;<font class="text-yellow">11</font>&nbsp;Anti-Spam&nbsp;rules&nbsp;(<font class="text-magenta">SFS</font>):<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(1032899013)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(12012899012)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(13230040)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(2066899003)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(29132699027)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(4022899009)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(4076899003)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(43022699015)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(69100299015)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(8096899003)<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SCL</font>:&nbsp;Spam&nbsp;Confidence&nbsp;Level:&nbsp;1<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Not&nbsp;spam</font>:&nbsp;The&nbsp;message&nbsp;skipped&nbsp;spam&nbsp;filtering<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(6)&nbsp;Test:&nbsp;<font class="text-cyan">X-MS-Exchange-Organization-SCL</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-Organization-SCL<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;1<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SCL</font>:&nbsp;Spam&nbsp;Confidence&nbsp;Level:&nbsp;1<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Not&nbsp;spam</font>:&nbsp;The&nbsp;message&nbsp;skipped&nbsp;spam&nbsp;filtering<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(7)&nbsp;Test:&nbsp;<font class="text-cyan">X-Microsoft-Antispam-Mailbox-Delivery</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Microsoft-Antispam-Mailbox-Delivery<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(930097)(140003)(1420198);<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;This&nbsp;header&nbsp;denotes&nbsp;where&nbsp;to&nbsp;move&nbsp;received&nbsp;message.&nbsp;Informs&nbsp;about&nbsp;applied&nbsp;Mail&nbsp;Rules,&nbsp;target&nbsp;directory&nbsp;in&nbsp;user's&nbsp;Inbox.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">ucf</font>:&nbsp;User&nbsp;Custom&nbsp;Flow&nbsp;(?)&nbsp;-&nbsp;custom&nbsp;mail&nbsp;flow&nbsp;rule&nbsp;applied&nbsp;on&nbsp;message?<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;0:&nbsp;No&nbsp;user&nbsp;custom&nbsp;mail&nbsp;rule&nbsp;applied.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">jmr</font>:&nbsp;Junk&nbsp;Mail&nbsp;Rule&nbsp;(?)&nbsp;-&nbsp;mail&nbsp;considered&nbsp;as&nbsp;Spam&nbsp;by&nbsp;previous,&nbsp;existing&nbsp;mail&nbsp;rules?<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;0:&nbsp;<font class="text-cyan">Mail&nbsp;not&nbsp;marked&nbsp;as&nbsp;Junk&nbsp;by&nbsp;mail&nbsp;rules.</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">auth</font>:&nbsp;Message&nbsp;originating&nbsp;from&nbsp;Authenticated&nbsp;sender<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;0:&nbsp;Not&nbsp;Authenticated<br/>
+<br/>
+-&nbsp;<font class="text-magenta">dest</font>:&nbsp;Destination&nbsp;where&nbsp;message&nbsp;should&nbsp;be&nbsp;placed<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;I:&nbsp;<font class="text-green">Inbox&nbsp;directory</font><br/>
+<br/>
+-&nbsp;Message&nbsp;matched&nbsp;<font class="text-yellow">8</font>&nbsp;Anti-Spam&nbsp;Delivery&nbsp;rules&nbsp;(<font class="text-magenta">ENG</font>):<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(140003)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(1420198)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(910001)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(920097)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(930097)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(944506478)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(944626604)<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(8)&nbsp;Test:&nbsp;<font class="text-cyan">X-Microsoft-Antispam&nbsp;Bulk&nbsp;Mail</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Microsoft-Antispam<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;BCL:0;ARA:13230040|1032899013|69100299015|12012899012|43022699015|4022899009|29132699027|2066899003<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|4076899003|8096899003;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-magenta">BCL</font>:&nbsp;BULK&nbsp;Confidence&nbsp;Level:&nbsp;<font class="text-green">0</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">The&nbsp;message&nbsp;isn&#x27;t&nbsp;from&nbsp;a&nbsp;bulk&nbsp;sender.</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(9)&nbsp;Test:&nbsp;<font class="text-cyan">MS&nbsp;Defender&nbsp;ATP&nbsp;Message&nbsp;Properties</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-AtpMessageProperties<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;SA|SL<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;MS&nbsp;Defender&nbsp;Advanced&nbsp;Threat&nbsp;Protection&nbsp;enabled&nbsp;following&nbsp;protections&nbsp;on&nbsp;this&nbsp;message:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-magenta">Safe&nbsp;Attachments</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-magenta">Safe&nbsp;Links</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(10)&nbsp;Test:&nbsp;<font class="text-cyan">End-to-End&nbsp;Latency&nbsp;-&nbsp;Message&nbsp;Delivery&nbsp;Time</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-Transport-EndToEndLatency<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;00:00:08.8825731<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;How&nbsp;much&nbsp;time&nbsp;did&nbsp;it&nbsp;take&nbsp;to&nbsp;deliver&nbsp;message&nbsp;from&nbsp;End-to-End:&nbsp;<font class="text-cyan">00:00:08.8825731</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(11)&nbsp;Test:&nbsp;<font class="text-cyan">Office365&nbsp;Tenant&nbsp;ID</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-CrossTenant-Id<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Office365&nbsp;Tenant&nbsp;ID:&nbsp;<font class="text-cyan">9d73024c-188c-4cc7-85f3-01568b4d323c</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Office365&nbsp;Tenant&nbsp;<font class="text-yellow">exists.</font><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Tenant&nbsp;ID&nbsp;found&nbsp;in&nbsp;following&nbsp;headers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(01)&nbsp;Header:&nbsp;<font class="text-magenta">X-EOPTenantAttributedMessage</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;<font class="text-yellow">9d73024c-188c-4cc7-85f3-01568b4d323c</font>:0<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(12)&nbsp;Test:&nbsp;<font class="text-cyan">SMTP&nbsp;Header&nbsp;Contained&nbsp;IP&nbsp;address</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+(01)&nbsp;Header:&nbsp;<font class="text-yellow">ARC-Authentication-Results</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">&nbsp;209.85.208.179)&nbsp;smt</font><br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(02)&nbsp;Header:&nbsp;<font class="text-yellow">Authentication-Results</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">P&nbsp;is&nbsp;209.85.208.179)</font><br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(03)&nbsp;Header:&nbsp;<font class="text-yellow">Received</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">com&nbsp;(209.85.208.179)&nbsp;by</font><br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(04)&nbsp;Header:&nbsp;<font class="text-yellow">Authentication-Results-Original</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">&nbsp;167.89.72.21&nbsp;as&nbsp;p</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(13)&nbsp;Test:&nbsp;<font class="text-cyan">Other&nbsp;unrecognized&nbsp;Spam&nbsp;Related&nbsp;Headers</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Other&nbsp;Spam&nbsp;related&nbsp;SMTP&nbsp;headers&nbsp;that&nbsp;were&nbsp;not&nbsp;processed:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(01)&nbsp;Header:&nbsp;&nbsp;&nbsp;ARC-Message-Signature<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+i=3;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=microsoft.com;&nbsp;s=arcselector10001;&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-ChunkCount:X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-0:X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-1;&nbsp;bh=KbSiTaojyOfGJxOWE4SF1Y3wH2b/L6bVG9FF7QosCYs=;&nbsp;b=fl3Q6N9NBLYC6pRw/A/d3Hm2Jx7LjS3haIUEafC4hqerBOZSspD/iDsnkeXx20jS1IX7wqDalnW5vDn461p9bAOumUEgKe0Z0dYaQc3eIm6GipPcNx4C3F+nbLOK9kpiOPH5Y030iHjJZym7/+Vatb2bC3EZNVM1LpyRmDO7b77rqRkfNDhsgrJZ2PpSgbfzdA/w0TMrL86mbKJO+5s6wBhoxqCcQrzSrDla7PY7VH6oKipdZwZfJzNCs8xxdnR/DMcTB/k2ydvH4yNTyOHZM3HmLHr9uCo9Olb3TrmtYTsPbpJOyY34rEwokrl+26gIUZSRrz6jd3kLlhulDQoL5g==<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(02)&nbsp;Header:&nbsp;&nbsp;&nbsp;X-Report-Abuse<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+Please&nbsp;report&nbsp;any&nbsp;<font class="text-red">spam</font>&nbsp;or&nbsp;abuse&nbsp;to:&nbsp;abuse@klaviyo.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(03)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-Microsoft-Anti<font class="text-red">spam</font>-Message-Info<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?kO17CfoU57G+BjsIWM0nGZJe2VDi8U3vLPc+dmBgRPOo3Qpg5cCbV/cEy5Kx?=&nbsp;=?us-ascii?Q?vz1jWsycKcgdFwBPs0BvDPdj6KlZSm5<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(14)&nbsp;Test:&nbsp;<font class="text-cyan">Other&nbsp;interesting&nbsp;headers</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Other&nbsp;Interesting&nbsp;SMTP&nbsp;headers&nbsp;that&nbsp;were&nbsp;not&nbsp;processed:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(01)&nbsp;Header:&nbsp;&nbsp;&nbsp;ARC-Seal<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;microsoft<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+i=3;&nbsp;a=rsa-sha256;&nbsp;s=arcselector10001;&nbsp;d=<font class="text-red">microsoft</font>.com;&nbsp;cv=pass;&nbsp;b=XrmTFw5H3/VoCRSY7Bg5/VpepMy+fz5IhUN/1RDYCZ4rzoAX3VU69l90HBwB9yaiu8RdtQiXCCaYjXz4SPKJ4jTuPgh61bH6O7m8LuYBPXXJuBFBsKjKIlk5XdlO7IFM9xIe4lym8/Yeokq45MilQLr7h+BWfXgBq96ZnQPl7XKFgrqZeZMU+4pEcbbHEm4eoe0TkEYdIMzvxXaBbNNaxf28r5qZZwrWPME9MnAC8Aoz1nt85eOk+gAab+BpAtu4jXq3HSLs7wiTeCJYkGuvAnFeokAgRmlUCjE089sHLGmaS92i1GaxT49nlW696068GG2M88kZaJx0ZbykSexKKQ==<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(02)&nbsp;Header:&nbsp;&nbsp;&nbsp;X-Gm-Message-State<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;seg<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+AOJu0YyFRBs32CMQqccgxQnka5YN/n+f5LcKrnUWBSWAz/bR9EIUen0L&nbsp;U0nO99L4V00wi<font class="text-red">seg</font>vmk/zDqIJpOXE/gW/OCXKwWv2BfC/O58QTWRwMU8jVcB1vypnsCuyC/OXDZ&nbsp;BInZkzsz+MDK7rRCA5hBbc2OF6QvWN9PQB54cQQv5o1bMwNsR8lifwSWtw5+vMBhwfq4+qEPrZJ&nbsp;gZVuI=<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(03)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;<font class="text-red">X-SG-</font>EID<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;x-sg-<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?u001=2ESNJDheVJO0robPXWjj4mbyxs0BzRfHOlT5YQQfsf9DUxxBgPkcKAFwcmE?=&nbsp;=?us-ascii?Q?NrLKhdjpQi58wzmFeFVhtSt9Qze<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(04)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;<font class="text-red">X-SG-</font>ID<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;x-sg-<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?u001=2ESdBcvi+Evd=2FbQef8eZF3BiU3Zi1S53GtqGa3TWBmqe75yn5aYrkvkfG+Z?=&nbsp;=?us-ascii?Q?GKrHRvq+sHL5MDEDZod8nwRGp<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(05)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationStartTime<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:14.9148&nbsp;(UTC)<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(06)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationStartTimeReason<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;OriginalSubmit<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(07)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationInterval<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;1:00:00:00.0000000<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(08)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationIntervalReason<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;OriginalSubmit<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(09)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-Network-Message-Id<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;b416b480-9e78-4615-fdc3-08dd183a5fb1<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(10)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-MessageDirectionality<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Incoming<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(11)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-AuthSource<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;DB5PEPF00014B9C.eurprd02.prod.outlook.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(12)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-AuthAs<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Anonymous<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(13)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Office365</font>-Filtering-Correlation-Id<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;office365<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;b416b480-9e78-4615-fdc3-08dd183a5fb1<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(14)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-OriginalArrivalTime<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:14.8992&nbsp;(UTC)<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(15)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-Network-Message-Id<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;b416b480-9e78-4615-fdc3-08dd183a5fb1<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(16)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-AuthSource<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;DB5PEPF00014B9C.eurprd02.prod.outlook.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(17)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-AuthAs<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Anonymous<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(18)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-FromEntityHeader<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Internet<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(19)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Transport-CrossTenantHeadersStamped<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;AM9PR03MB7852<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(20)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Processed-By-BccFoldering<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;15.20.8230.010<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(15)&nbsp;Test:&nbsp;<font class="text-cyan">Security&nbsp;Appliances&nbsp;Spotted</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;During&nbsp;headers&nbsp;analysis,&nbsp;spotted&nbsp;following&nbsp;clues&nbsp;about&nbsp;Security&nbsp;Appliances:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;Defender&nbsp;for&nbsp;Office365&nbsp;-&nbsp;Safe&nbsp;Attachments</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">Office365</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;Defender&nbsp;Advanced&nbsp;Threat&nbsp;Protection</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;ForeFront&nbsp;Anti-Spam</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;Defender&nbsp;for&nbsp;Office365&nbsp;-&nbsp;Safe&nbsp;Links</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(16)&nbsp;Test:&nbsp;<font class="text-cyan">Email&nbsp;Providers&nbsp;Infrastructure&nbsp;Clues</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Mail&nbsp;contents&nbsp;analysis&nbsp;shown&nbsp;that&nbsp;this&nbsp;e-mail&nbsp;passed&nbsp;through&nbsp;the&nbsp;following&nbsp;third-party&nbsp;Mail&nbsp;providers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Dyn</font>&nbsp;-&nbsp;url:&nbsp;https://dyn.com/<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(17)&nbsp;Test:&nbsp;<font class="text-cyan">MTA&nbsp;Hostname&nbsp;Exposed</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Received<br/>
+<br/>
+<font class="text-blue">DESCRIPTION</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Some&nbsp;webmails&nbsp;or&nbsp;mail&nbsp;clients&nbsp;(such&nbsp;as&nbsp;MS&nbsp;Outlook)&nbsp;are&nbsp;known&nbsp;to&nbsp;attach&nbsp;system's&nbsp;Hostname&nbsp;to&nbsp;their<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;"Received"&nbsp;header&nbsp;thus&nbsp;exposing&nbsp;it&nbsp;to&nbsp;all&nbsp;the&nbsp;other&nbsp;MTAs.&nbsp;This&nbsp;can&nbsp;lead&nbsp;to&nbsp;an&nbsp;internal<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;information&nbsp;disclosure.&nbsp;This&nbsp;test&nbsp;shows&nbsp;potential&nbsp;hostname&nbsp;values&nbsp;extracted&nbsp;from&nbsp;Received<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;headers&nbsp;as&nbsp;server-names,&nbsp;that&nbsp;couldn't&nbsp;been&nbsp;resolved&nbsp;back&nbsp;to&nbsp;their&nbsp;IPv4/IPv6.<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;<font class="text-red">MzQwNjI4Njg</font>&nbsp;(unknown)&nbsp;by&nbsp;geopod-ismtpd-0&nbsp;(SG)&nbsp;with&nbsp;HTTP&nbsp;id<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;pb7GeLWZRUK4LSzn9nYnzA&nbsp;Mon,&nbsp;09&nbsp;Dec&nbsp;2024&nbsp;10:15:09.903&nbsp;+0000&nbsp;(UTC)<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Some&nbsp;MTAs&nbsp;(Mail&nbsp;Transfer&nbsp;Agents)&nbsp;probably&nbsp;exposed&nbsp;their&nbsp;internal&nbsp;Hostnames:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-magenta">Received</font>&nbsp;#1&nbsp;:&nbsp;<font class="text-red">MzQwNjI4Njg</font><font class="text-yellow">&nbsp;(this&nbsp;might&nbsp;be&nbsp;the&nbsp;sender&#x27;s&nbsp;computer&nbsp;hostname!)</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(18)&nbsp;Test:&nbsp;<font class="text-cyan">Identified&nbsp;Sender&nbsp;Addresses</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Return-Path<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;From<br/>
+<br/>
+<br/>
+<font class="text-blue">DESCRIPTION</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Sender's&nbsp;address&nbsp;was&nbsp;found&nbsp;in&nbsp;2&nbsp;different&nbsp;SMTP&nbsp;headers.<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;dynamate.be@esign.eu<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;hello@cyclowax.com<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Identified&nbsp;sender&nbsp;addresses&nbsp;(2):<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">Return-Path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>:&nbsp;<font class="text-green">dynamate.be@esign.eu</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">From&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>:&nbsp;<font class="text-green">hello@cyclowax.com</font><font class="text-red"><br/>
+<br/>
+-&nbsp;WARNING!&nbsp;Not&nbsp;all&nbsp;sender&nbsp;addresses&nbsp;match&nbsp;each&nbsp;other&nbsp;-&nbsp;potential&nbsp;Mail&nbsp;Spoofing!<br/>
+</font>-&nbsp;See&nbsp;here&nbsp;for&nbsp;more&nbsp;info:&nbsp;https://blog.shiraj.com/2020/05/email-spoofing/<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(19)&nbsp;Test:&nbsp;<font class="text-cyan">Unsual&nbsp;SMTP&nbsp;headers</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;This&nbsp;script&nbsp;is&nbsp;aware&nbsp;of&nbsp;210&nbsp;typical&nbsp;SMTP&nbsp;Headers.<br/>
+<br/>
+-&nbsp;Below&nbsp;7&nbsp;headers&nbsp;are&nbsp;considered&nbsp;unusual:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-Forwarded-Encrypted</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;i=2;&nbsp;AJvYcCXE2UzRSR98eX7NhZW39QXi8XUCTgpqtXyGlUfKByluBofcR55&nbsp;(...)<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-Forwarded-To</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;matthias.stevens@dynamate.be<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-Forwarded-For</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;matthias@esign.eu&nbsp;matthias.stevens@dynamate.be<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-Kmail-Account</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;XTkQCR<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-Kmail-Message</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;01JEN8C71GGD0KHN85FQ6R64T6<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-Kmail-Ops</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;01GZC7PQ3VWDVJSK3TMN47MJ6N<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-EOPTenantAttributedMessage</font>&nbsp;&nbsp;:&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c:0<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(20)&nbsp;Test:&nbsp;<font class="text-cyan">Suspicious&nbsp;Words&nbsp;in&nbsp;Headers&nbsp;1</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;List-Unsubscribe-Post<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;List-Unsubscribe=One-<font class="text-red">Click</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-cyan">List-Unsubscribe-Post</font>&nbsp;header&nbsp;contained&nbsp;<font class="text-red">1&nbsp;suspicious&nbsp;words</font>&nbsp;(out&nbsp;of&nbsp;778&nbsp;total&nbsp;checked).<br/>
+<br/>
+-&nbsp;Found&nbsp;<font class="text-red">1</font>&nbsp;<font class="text-yellow">Marketing</font>&nbsp;words&nbsp;<font class="text-cyan"></font>:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-red">Click</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(21)&nbsp;Test:&nbsp;<font class="text-cyan">Suspicious&nbsp;Words&nbsp;in&nbsp;Headers&nbsp;4</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;From<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Cyclowax&nbsp;<<font class="text-red">hello</font>@cyclowax.com><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-cyan">From</font>&nbsp;header&nbsp;contained&nbsp;<font class="text-red">1&nbsp;suspicious&nbsp;words</font>&nbsp;(out&nbsp;of&nbsp;777&nbsp;total&nbsp;checked).<br/>
+<br/>
+-&nbsp;Found&nbsp;<font class="text-red">1</font>&nbsp;<font class="text-yellow">Cheap</font>&nbsp;words&nbsp;<font class="text-cyan">no&nbsp;pre-qualifications,&nbsp;everybody&nbsp;wins</font>:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-red">hello</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(22)&nbsp;Test:&nbsp;<font class="text-cyan">Suspicious&nbsp;Words&nbsp;in&nbsp;Headers&nbsp;11</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Report-Abuse<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Please&nbsp;report&nbsp;any&nbsp;<font class="text-red">spam</font>&nbsp;or&nbsp;abuse&nbsp;to:&nbsp;abuse@klaviyo.com<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-cyan">X-Report-Abuse</font>&nbsp;header&nbsp;contained&nbsp;<font class="text-red">1&nbsp;suspicious&nbsp;words</font>&nbsp;(out&nbsp;of&nbsp;778&nbsp;total&nbsp;checked).<br/>
+<br/>
+-&nbsp;Found&nbsp;<font class="text-red">1</font>&nbsp;<font class="text-yellow">Shady</font>&nbsp;words&nbsp;<font class="text-cyan">ethically&nbsp;or&nbsp;legally&nbsp;questionable&nbsp;behavior</font>:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-red">spam</font><br/>
+</div><br/>
+
+  </body>
+</html>

@@ -1,0 +1,140 @@
+Received: from AS8PR03MB9167.eurprd03.prod.outlook.com (2603:10a6:20b:5c1::6)
+ by PAXPR03MB8014.eurprd03.prod.outlook.com with HTTPS; Tue, 5 Nov 2024
+ 07:10:15 +0000
+Received: from DU7P189CA0005.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:552::8) by
+ AS8PR03MB9167.eurprd03.prod.outlook.com (2603:10a6:20b:5c1::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8114.31; Tue, 5 Nov 2024 07:10:10 +0000
+Received: from DB1PEPF000509F2.eurprd02.prod.outlook.com
+ (2603:10a6:10:552:cafe::78) by DU7P189CA0005.outlook.office365.com
+ (2603:10a6:10:552::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30 via Frontend
+ Transport; Tue, 5 Nov 2024 07:10:10 +0000
+Authentication-Results: spf=pass (sender IP is 212.6.174.181)
+ smtp.mailfrom=newsmonizzedealzz.monizze.be; dkim=pass (signature was
+ verified) header.d=newsmonizzedealzz.monizze.be;dmarc=pass action=none
+ header.from=newsmonizzedealzz.monizze.be;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of
+ newsmonizzedealzz.monizze.be designates 212.6.174.181 as permitted sender)
+ receiver=protection.outlook.com; client-ip=212.6.174.181;
+ helo=mx-ca-181.xqueue.com; pr=C
+Received: from mx-ca-181.xqueue.com (212.6.174.181) by
+ DB1PEPF000509F2.mail.protection.outlook.com (10.167.242.148) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8137.17
+ via Frontend Transport; Tue, 5 Nov 2024 07:10:10 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=xq; d=newsmonizzedealzz.monizze.be;
+ h=X-CSA-Complaints:List-Unsubscribe-Post:Date:From:Reply-To:To:Message-Id:
+ Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:List-Unsubscribe;
+ i=info@newsmonizzedealzz.monizze.be;
+ bh=BO1rwZev+y8UddQPjb1+85IzgqvOOVjPRViT3hPBRRA=;
+ b=Q8xEKKG/6KHlOXdVV6Fd6nwh5+NWjv5AlKC/Zc4jgRy6ydP9Pw91hT/iN9RzSecR/2LNW1serMXV
+   zp65zvyJpbqU5Pyh59mgZHd8BRIl7HhDlWvaeJfOafA6s0B55YIj02GSe+mBqNqSfbAUNQLntnDx
+   w9BukwD4JlIUFGqLa4I=
+Received: by mx-ca-181.xqueue.com id h572d42pk78o for <rino.veryser@christiaens.net>; Tue, 5 Nov 2024 08:10:09 +0100 (envelope-from <bounce-hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla@newsmonizzedealzz.monizze.be>)
+X-Report-Abuse: Please report spam/abuse here: complaints@xqueue.com
+X-CSA-Complaints: csa-complaints@eco.de
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Date: Tue, 5 Nov 2024 08:03:32 +0100 (CET)
+From: Monizze Dealzz <info@newsmonizzedealzz.monizze.be>
+Reply-To: reply-hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla@newsmonizzedealzz.monizze.be
+To: rino.veryser@christiaens.net
+Message-Id: <hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla@newsmonizzedealzz.monizze.be>
+Subject: =?UTF-8?Q?=F0=9F=99=8CMaasmechelen,_Factor,_Impact_Us?=
+ =?UTF-8?Q?_Today_&_vele_andere_aanbiedingen?=
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+List-Unsubscribe: <https://newsmonizzedealzz.monizze.be/i/unsubscribe/hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla>,
+ <mailto:unsubscribe-hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla@newsmonizzedealzz.monizze.be?subject=unsubscribe>
+X-Mailer: Maileon
+X-Maileon-FingerPrint: hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla
+X-Campaign: M.9977|1146
+Feedback-ID: Typeregular:MailingID1146:Sender9977
+Return-Path:
+ bounce-hdh3vfe5bp5vdp7akth2wpc63gjupa6fdes57ehl5hpptzdlysla@newsmonizzedealzz.monizze.be
+X-MS-Exchange-Organization-ExpirationStartTime: 05 Nov 2024 07:10:10.5026
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ aa2924ea-5a84-40ef-a61e-08dcfd68e2e7
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 9d73024c-188c-4cc7-85f3-01568b4d323c:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic:
+ DB1PEPF000509F2:EE_|AS8PR03MB9167:EE_|PAXPR03MB8014:EE_
+X-MS-Exchange-Organization-AuthSource:
+ DB1PEPF000509F2.eurprd02.prod.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id: aa2924ea-5a84-40ef-a61e-08dcfd68e2e7
+X-MS-Exchange-AtpMessageProperties: SA|SL
+X-MS-Exchange-Organization-SCL: 1
+X-Microsoft-Antispam:
+ BCL:3;ARA:13230040|69100299015|3072899012|1032899013|4022899009|2092899012|12012899012|8096899003|2066899003;
+X-Forefront-Antispam-Report:
+ CIP:212.6.174.181;CTRY:DE;LANG:nl;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mx-ca-181.xqueue.com;PTR:mx-ca-181.xqueue.com;CAT:NONE;SFS:(13230040)(69100299015)(3072899012)(1032899013)(4022899009)(2092899012)(12012899012)(8096899003)(2066899003);DIR:INB;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 07:10:10.4244
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa2924ea-5a84-40ef-a61e-08dcfd68e2e7
+X-MS-Exchange-CrossTenant-Id: 9d73024c-188c-4cc7-85f3-01568b4d323c
+X-MS-Exchange-CrossTenant-AuthSource:
+ DB1PEPF000509F2.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB9167
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:05.2760348
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.8114.031
+X-Message-Flag: Flag for follow up
+X-Microsoft-Antispam-Mailbox-Delivery:
+ dwl:1;ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(831239)(255002)(410001)(930097)(140003)(1420198);
+X-Microsoft-Antispam-Message-Info:
+ =?utf-8?B?TmZyN2NzSWR0b3V3R1N6N2FnSm9jNm4rUVRWTnVIaVN0SkV5aUN0b0MyU1BP?=
+ =?utf-8?B?ZEJjd2V5NlpXTnExbm40WlM3emRya0hvdXNoSzhvSUozVnRFWGx2bVc4N1Fu?=
+ =?utf-8?B?QnVXNjUvZGd3ancxRzV6S3FlUlR2ejQ3V0pjaUtVMU5yN2hKT2tDV3dwMnVU?=
+ =?utf-8?B?QUVvczYrUGRhTW96RS9hVFRQZkRIb1pxZ2RqTXNDaHdYeitaRGRXenVlZW14?=
+ =?utf-8?B?eElVOExaRlhzREJnbG5NTVRmNlU5SWlaQTBRT0RmR2Y2TFhOOE9vZ3ZPUGdq?=
+ =?utf-8?B?TFp0QTI1Qjl2Q3owZHE0Tm9TeDIwRWlibkExWmZnTVp0dHhmN05RWWk1YTlL?=
+ =?utf-8?B?d2FIV2Rza3AwanRmc1NmZTJEa2RYa2NTdUlUUm5YZUZZdXhwejBvUHNCMlBu?=
+ =?utf-8?B?WDlyOGFHM0VPOFpkUm1DZUkrVHk0UU0yM1l4dzkvS011S1QvOHIyMklwaW9i?=
+ =?utf-8?B?S0xWRldmd0dHNmd5VVlxM2xMYm1udFJMTVF4OWg4c3FVZmx0aGhQRk50MnhD?=
+ =?utf-8?B?MHA1cjMvOGZzMC8wQ1VvdGxlRFpxWGROalpzRE5haGhhSUg4bTdwcDVZWDFH?=
+ =?utf-8?B?L0ZMOHpFWmgrVk05QWRNL0lLdlJZV1dQQ2xRT0RJVXJuazZXZ0IzS1B5SVlh?=
+ =?utf-8?B?NGJyRmlBWUQrM0pxamYxcTJtcUFFbDdaVlNNbjcwaEFOOVJZdmRuU0VlWHRI?=
+ =?utf-8?B?WGZRRWhwMnpnQU5ZN3o1b3BpK2sxWjVMZUVuNWRoK3dJWStENGlpbjNNd3dy?=
+ =?utf-8?B?YWJMTG41R3QweUloRjlOUUZNb2pQaklFL0ZYcDhsa3VtdEptaUpOMGVZQ2ZD?=
+ =?utf-8?B?cGk1Q3VYUi9idjRNa2dJUk9nbUZpZCs3L3hCS0NDZTF3bXlJMXpVdWxDMm0v?=
+ =?utf-8?B?aml4S20vNGRDUVRmbzh1d2JmcUZuelZiN0RQM0d1S0hBNXgzdjVoaFVxbVpq?=
+ =?utf-8?B?bml0bGUvS3BROUlDeXVSN3FVdDBYaHh0NDFyR0Q1MnEzWkRDaXhwQ0dpSGlR?=
+ =?utf-8?B?YjFvNWczVjFYTC8yd3JueWhsWXRCOFFiTTJKUXV4ZUUrUWo2OFlHNTNGWkZr?=
+ =?utf-8?B?WlJtZCtYbzhHKzQzUGMrQkVHSEpjckpFMEl2RjRPdERwUnRQUFNMZXZOakh0?=
+ =?utf-8?B?YWtWMzlONjgrU0QyVWlUaFVLeEw5YVZwdmtmQ25RRCtFbFArMTN6WnhQb0hs?=
+ =?utf-8?B?SG1DRHNabUVBNVJ3Zi9aUEkxRFhOWnRSTHlqNnZKc0IzMzY5RW94VERwalI5?=
+ =?utf-8?B?b0RyWCt6a0tuRDNKUmZoMng3YjhTTngwOEhGaVBBTTdNaU0vNU9UUHBRL0Vp?=
+ =?utf-8?B?eEdEL1FLRjFJN1MrMzd6dmJFbDlpcWRjd0FPNURQMVEvR2Y5REM4azVOMjdi?=
+ =?utf-8?B?Z0x4NTJSYnM0TXluYks3dlZQc1o5a2JTaU1QS1FqMnAySmFYUmVhTXJBU3hk?=
+ =?utf-8?B?bWFrK1lyRVJSbHV1Vm9WOGxYazBtbzk4SWFndytGNVc4VGJlaHJVUWFVNWk4?=
+ =?utf-8?B?SFNQTVRDZzRXdUR6eWY3eXZVeExJbHdhL25KcldQdGNLbUVzbWJzaUVpNWh6?=
+ =?utf-8?B?MG1GV2g1bVRhdlQveU9wVjQwUVdHc29wSVJKbjRGWkV0NnROL3VNSzRpSUZJ?=
+ =?utf-8?B?ZzI0V1lKVGJrMEVqQmU2MHdJOVhvdGVzamR4VmkxazU2a2N6azZCU1pHMFA2?=
+ =?utf-8?B?ZEh2M0p4VWZkUzN0Y2lYT3RWVGNuOXNyMkE1eE04UzJ2M29wTUE2ZlVpQURa?=
+ =?utf-8?B?M1JibDRqeHkzL0JXNGZoZmcwSjlWQ0JuZWRmeURhd3FaeVRUZnQwOTh0VTVk?=
+ =?utf-8?B?YVpOU2czZ3RwVmRXbzRVbE82UTArVmM5bzNSOEZkRDl2b2F1QjdlTCs4cnZw?=
+ =?utf-8?B?RUNGNEVndndhcHJiRi9oV1FaSXh5NDVhMzAycHZLZUZFcWh3NWo3Z0h4akF6?=
+ =?utf-8?B?dThNWFRyUFUrd1BkOEJHRlFBa2lEdTlHMTg3UDdzUVY3dlBVM2dPYi9zcm92?=
+ =?utf-8?B?dGNmd3piSjVQRzA4V1JEelNqYk4zWjVybENHSVJmUE1WZEdpQkt5ckxDUHF1?=
+ =?utf-8?B?OWdsNGpJNGtQbm8yZjlPaENBbkRZZnVQRFZDTVFDSXNLUmNHVERtQU1IRXZI?=
+ =?utf-8?B?dW1BQUlvSWdkbmFoTHZEcFV5S29welJkN0w3ZkdsUUNvQnNvbGRhaGdGbnhz?=
+ =?utf-8?B?akp1VHdMbGoyVXkwQTVSSHJpTG1DV01LaTJWMXBNVlFQWmExYWxIZ1JUQmRB?=
+ =?utf-8?B?NWlXSmt2RlltNXdNaFpzSkF0QkIzdnVRRy9nQXpBdlJhQlFoY2xCYkU5S0xL?=
+ =?utf-8?B?K0ROOEFyemJUSWY3WlhWOGxZU1BydVZmNEFYUGlqMWxBOUdQRml6d2FoZTR1?=
+ =?utf-8?B?RTVweDFPUWttQVdyWEdmek1yOENZcU1PNzBjODBjblcwenRhc2xBMHRvbHRL?=
+ =?utf-8?B?ZTlWWUpkcE0wdTFBM0xEUnFxY0FmRURLOW5RZEFLWHF0bHZJam5CNkhLcFdk?=
+ =?utf-8?B?RXFsU2JMRzRZY0JQRm9oQXNuS0locW1VMTYzYy9ka0hmdzA3OVptcThldXpN?=
+ =?utf-8?B?cExMRmxOYTdWaDVoanJaRUdsSFBhY3Rzanp3L2I3Sk5EYXUvbmJLaTZYcU9G?=
+ =?utf-8?B?WjJRTHhXOU1BbTB0WFZJUVh1QTd0cXFrKy8vSm1PWU1yZTQ3MTZJZ2F6c09L?=
+ =?utf-8?B?Y1NuSG9CcnZwRU8vTE9BQU9ZMnlXRU1YOGhQQU9wYWJ5Z1hWcklkWEs5TXJj?=
+ =?utf-8?B?VFBkT01Pc1ZsQzQvSm5nOW9DenhTVnpmYmMzcFV4REp6N21aU0tyTDZyYWhx?=
+ =?utf-8?B?VUV1bG5vYTAzcWdrbFhURVRNblp5VFYvbk5YTGdnNnQ5YlBnWWxYWDFITXJY?=
+ =?utf-8?Q?ub2OGNgFcLhnhuH1+d1vkaynhW/1cxNQ34J3dyD4=3D?=
+MIME-Version: 1.0

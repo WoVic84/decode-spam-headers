@@ -1,0 +1,4 @@
+cd "c:\dynamate\python"
+py decode-spam-headers.py mail2.txt -f html -o report2.html
+start-process report2.html
+

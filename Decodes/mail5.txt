@@ -1,0 +1,93 @@
+Delivered-To: matthias@esign.eu
+Received: by 2002:a2e:b5d0:0:b0:2ff:b151:bce1 with SMTP id g16csp210443ljn;
+        Thu, 5 Dec 2024 07:45:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGihtONFNe0ZQmt8neva9m2oCO3X5kL4Gj5XaMJoyPhCJLcPUDgQmMwI3qHXAOMwJ33tgvm
+X-Received: by 2002:a17:902:cecb:b0:215:3998:189f with SMTP id d9443c01a7336-215f3c5a670mr54234985ad.6.1733413502096;
+        Thu, 05 Dec 2024 07:45:02 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1733413502; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gOXnhI1l1iOoQVC2iOGelo5j0CgxfTfAZxuGTWvCPz5WuSGK56IUizJvn5LtcY2Mg2
+         +p01XaZ3WQYSxjwLR5b+WS783/0GvbxwDwYQHujvhYwxDeu89UTSMpbdR0iSo2Me7BjI
+         alaubbcqFp0qFh/PaGyQlAo/gN+FKDwcwUDrF7jbFixeFHrYfP/D+R6L+SxNyJlFdMqB
+         kmXlK9XnQOo4oREdEzy/c4N6G25weHiGD0xK/KNmKHrmC5MUxsQZI6Lc9TR/i8uzpeyL
+         XwC8Vmdiv91OVhzNHmvAF3uha3jtsC+QjCIqTZE6FgzAUCZjOJvcCo/Y7RmptRs/BN8z
+         3zRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:list-unsubscribe:list-unsubscribe-post:subject:message-id
+         :mime-version:from:date:dkim-signature;
+        bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+        fh=caNR/YRUhfferXcZwyNQZyI1RI34QOu5tDIw1g7aUNU=;
+        b=QZhABDjdJxlGj2AaFl0/2IPOgWBRfBc1Rf1O8PNJNtb+pOUh+dJKNq3XLni04JlFE6
+         eirlquk6LI1G2rGxeuYXUMDOfwRL0hocX5qjPUdjwwfxbzOy+NIGx49P9xlk+YGrCxSC
+         YTRtV8buDMlOGKbLJmPqBo6wD8HDCs6MfxvqFmOv1+tnZAIh9Kv0yNeYxetRU1lWTtbu
+         /JLxmB8MNtmnAmJ5BBelELc4ZOgr+mVvyWSFDjS4+XQ4DsulOoFlWSZvHAmUsVC3Ua9S
+         skVNgwhjvvNbP571L84KUFPiplsoWrjINwNav/XHAvpxib9nLEvlHwuTqv6sKC4ueKVx
+         KLlw==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@mcalson.com header.s=kl header.b=FYgV0RFY;
+       spf=pass (google.com: domain of bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates 168.245.31.178 as permitted sender) smtp.mailfrom="bounces+33817899-0853-matthias=esign.eu@send.mcalson.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=mcalson.com
+Return-Path: <bounces+33817899-0853-matthias=esign.eu@send.mcalson.com>
+Received: from o1328.shared.klaviyomail.com (o1328.shared.klaviyomail.com. [168.245.31.178])
+        by mx.google.com with ESMTPS id d9443c01a7336-215f8f0bccesi19444865ad.333.2024.12.05.07.45.00
+        for <matthias@esign.eu>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2024 07:45:02 -0800 (PST)
+Received-SPF: pass (google.com: domain of bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates 168.245.31.178 as permitted sender) client-ip=168.245.31.178;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@mcalson.com header.s=kl header.b=FYgV0RFY;
+       spf=pass (google.com: domain of bounces+33817899-0853-matthias=esign.eu@send.mcalson.com designates 168.245.31.178 as permitted sender) smtp.mailfrom="bounces+33817899-0853-matthias=esign.eu@send.mcalson.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=mcalson.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mcalson.com;
+	h=content-type:from:mime-version:subject:list-unsubscribe-post:
+	list-unsubscribe:to:cc:content-type:from:subject:to;
+	s=kl; bh=Lgx079p5aKT+o/e9Sna4XOpTd6Ex33cMun3S9UNWxQY=;
+	b=FYgV0RFY0EfrSPSkF//BZusF6nOYUIJTnVLTKYkdVKfD5MdrGdIML03BLKhKHP7LtA9d
+	J0O4nuLgHxH15Nitf2YVEhdOqXZ4qSXRE+ExnSjJCcmcwyUjshQSQ6JKXVQhtSJi8wRQvX
+	qEHxwagVBRmz61NBTLATTOtVzKF/ImVPa1ZvV1eVvl/SA+FbwWV1Tz6fxymHjMTseyhsyR
+	CVO/FsvxZxhoZUB60r9RCyFdNcOPoxwnxs90ewRj4L9lEEw4//ACMs5cwC7XWJfXw0mqjA
+	PiMOOfMXuFjvhuYuddJW9FLf4TpJziW5ekHH5y5kWhMOxu1jf2NYRPqlDiESyQIA==
+Received: by recvd-84b546689d-bxfnp with SMTP id recvd-84b546689d-bxfnp-1-6751CA7B-2B
+	2024-12-05 15:44:59.474208357 +0000 UTC m=+1794043.077279335
+Received: from MzM4MTc4OTk (unknown)
+	by geopod-ismtpd-35 (SG) with HTTP
+	id M5FwYtcxSUCfPw-4PwWkpg
+	Thu, 05 Dec 2024 15:44:59.436 +0000 (UTC)
+Content-Type: multipart/alternative; boundary=1cab650b91a59ce36cc9058b85e876b825fe2d50f5fac4d09368cbffc130
+Date: Thu, 05 Dec 2024 15:44:59 +0000 (UTC)
+From: McAlson <info@mcalson.com>
+Mime-Version: 1.0
+Message-ID: <M5FwYtcxSUCfPw-4PwWkpg@geopod-ismtpd-35>
+Subject: =?UTF-8?B?8J+OgQ==?= New Christmas prints, packs & gift ideas!
+X-Kmail-Ops: 01GYJ2S0N9CHBBPJK4HFF6JFV2
+X-Report-Abuse: Please report any spam or abuse to: abuse@klaviyo.com
+X-Kmail-Account: Rm8aND
+X-Kmail-Message: 01JEBM2JJX5QX8DPM58C6YXBWM
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+List-Unsubscribe: 
+ =?us-ascii?Q?=3Chttps=3A=2F=2Fmanage=2Ekmail-lists=2Ecom=2Fsubscriptions=2Funsubscribe=3Fa=3DRm?=
+ =?us-ascii?Q?8aND&c=3D01GYJ2S0N9CHBBPJK4HFF6JFV2&k=3D0b7?=
+ =?us-ascii?Q?16eba547fb2af04a8eff0bae2a305&m=3D01JEBM2?=
+ =?us-ascii?Q?JJX5QX8DPM58C6YXBWM&r=3D3kpx8xaQ=3E?=
+X-SG-EID: 
+ =?us-ascii?Q?u001=2ElIxidJz+FylJT4fFZkAmDNgs=2FPBnaIrL6ANgjMSr4YmHtb39Wj=2Fhdg=2FGK?=
+ =?us-ascii?Q?8FHnup69CY33tdh6H5K8loLzsL3dKS5PRiCup2B?=
+ =?us-ascii?Q?N455NqJFLDUTy0+0sunE3BfGOdkpbbP8RiS3zNh?=
+ =?us-ascii?Q?cAmUZfA37YQo8bvN1eaN0ZShkc9Y=2FWC6KTuMn0Y?=
+ =?us-ascii?Q?EW5XsTfTZPp+7DxY=2FhHtc0VPaB+D+frjJ78=2FUTA?=
+ =?us-ascii?Q?PIkU+wdh7xLEY6ntyGQ4iE=3D?=
+X-SG-ID: 
+ =?us-ascii?Q?u001=2ESdBcvi+Evd=2FbQef8eZF3BiU3Zi1S53GtqGa3TWBmqe75yn5aYrkvkfG+Z?=
+ =?us-ascii?Q?GKrHRvqcDBlpdKT12kl=2Fs4Kqg5w0fEiEre4aJhu?=
+ =?us-ascii?Q?dDhQwM=2FPRxuBQLrCIgwTIM8Di6hhvvh6Hk=2Fc0Bb?=
+ =?us-ascii?Q?hzesxa5JtPnGk9iDT1lvWm45loOTU9d1A1FrFfY?=
+ =?us-ascii?Q?GB6Qg8j8gtnRacFYTA29ofaHxjqbPgLVeAcxs0g?=
+ =?us-ascii?Q?GjFkkLEqkA=2FFUQN4tGWylIOUsvRRghdew0zm4JV?=
+ =?us-ascii?Q?ZdDiyqoY0T6uS7mNDfP7YeATdem9whVmWmtpDyA?=
+ =?us-ascii?Q?L2y56wvZeZ0M46vTpCgw3LnhuE+N8kU294pYXGz?=
+ =?us-ascii?Q?WXbTHKa3rn0vSRo4K7ZYQ0NcC=2F0qZK04vWaE8Ov?=
+ =?us-ascii?Q?dMUbjnGOwpoDcQA?=
+To: Matthias Stevens <matthias@esign.eu>
+X-Entity-ID: u001.jVF3de4XWWIJlpWFfMd6kw==
+

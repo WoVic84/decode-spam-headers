@@ -1,0 +1,1006 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Decode Spam Headers</title>
+  </head>
+  <style>
+  body {
+    background-color:rgb(40, 44, 52);
+    color: rgb(220, 223, 228);
+    font-family: Consolas, monaco, monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 20px;
+  }
+
+  .text-white {
+    color: rgb(220, 223, 228);
+  }
+
+  .text-grey {
+    color: rgb(132, 139, 149);
+  }
+
+  .text-red {
+    color: rgb(224, 108, 117);
+  }
+
+  .text-green {
+    color: rgb(108, 135, 94);
+  }
+
+  .text-yellow {
+    color: rgb(229, 192, 123);
+  }
+
+  .text-blue {
+    color: rgb(97, 175, 239);
+  }
+
+  .text-magenta {
+    color: rgb(198, 120, 221);
+  }  
+
+  .text-cyan {
+    color: rgb(86, 182, 194);
+  }
+
+  h1 {
+ font-family: Consolas, monaco, monospace;
+ font-size: 24px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 700;
+ line-height: 26.4px;
+ }
+
+ h3 {
+ font-family: Consolas, monaco, monospace;
+ font-size: 14px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 700;
+ line-height: 15.4px;
+ }
+
+ p {
+ font-family: Consolas, monaco, monospace;
+ font-size: 14px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 400;
+ line-height: 20px;
+ }
+
+ blockquote {
+ font-family: Consolas, monaco, monospace;
+ font-size: 14px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 400;
+ line-height: 30px;
+ }
+
+ pre {
+ font-family: Consolas, monaco, monospace;
+ font-size: 13px;
+ font-style: normal;
+ font-variant: normal;
+ font-weight: 400;
+ line-height: 18.5714px;
+ }
+
+ summary::-webkit-details-marker {
+  color: #00ACF3;
+  font-size: 125%;
+  margin-right: 2px;
+}
+
+summary:focus {
+    outline-style: none;
+}
+
+article > details > summary {
+    font-size: 18px;
+    margin-top: 16px;
+}
+
+details > p {
+    margin-left: 14px;
+}
+
+blockquote code {
+    background-color: rgba(0, 0, 0, .07);
+    display: block;
+    font-family: Consolas, monaco, monospace;
+    font-size: 13px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 18.5714px;    
+}
+
+a {
+   color: rgb(108, 135, 94);
+   text-decoration: none;
+}
+
+  </style>
+  <body>
+    <div>
+        <br/>
+        <h2>
+        SMTP Headers analysis by <a href="https://github.com/mgeeky/decode-spam-headers">decode-spam-headers.py</a>
+        </h2>
+        <i style=".text-grey">(brought to you by <a style="size:8px" href="https://twitter.com/mariuszbit">@mariuszbit</a>)</i>
+        <br/>
+        <br/>
+        <br/>
+        <article>
+          <details>
+            <summary>Original SMTP Headers</summary>
+            <blockquote>
+            <code>
+Received:&nbsp;from&nbsp;AS8PR03MB7624.eurprd03.prod.outlook.com&nbsp;(2603:10a6:20b:348::12)<br/>
+&nbsp;by&nbsp;VI1PR03MB9899.eurprd03.prod.outlook.com&nbsp;with&nbsp;HTTPS;&nbsp;Fri,&nbsp;4&nbsp;Oct&nbsp;2024<br/>
+&nbsp;11:53:43&nbsp;+0000<br/>
+ARC-Seal:&nbsp;i=2;&nbsp;a=rsa-sha256;&nbsp;s=arcselector10001;&nbsp;d=microsoft.com;&nbsp;cv=pass;<br/>
+&nbsp;b=GD7mc6fSYxZxNiHnPAhm0Gt0IXS6dbjJkQjNggTmMW1g3aSc/dwFMsoru3VtNg1Cb0kA8RxPCNojuTuInADHQlUP3JwX8CxHNRcvjQmMyD3k34OhcLG1/p0MWg/kzTj85PSuU9eoy5eI+Y2b+cAwiYefVqbM6VK+udhGpJZ8bBRH4C8hvr7fbeG6ymYZrTUbZYb+yx0J91tm33MCcsPzMOa1VEH/8m2ba1976+ssiFx6Bw4rQ5LVCujtNQoA6DKsk5/zSMUjoWYHfB8Q4LxTK7Zdt/Yop2B1iYGhSl+wKKcBeV2+vcB66j1VK6F3BLq/PbWXbDO2Y29ReKkfgXPj1A==<br/>
+ARC-Message-Signature:&nbsp;i=2;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=microsoft.com;<br/>
+&nbsp;s=arcselector10001;<br/>
+&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;<br/>
+&nbsp;bh=RJjEMGZ6o0aBldmVjw/xfs9Z9RY3nXPj81prUv5ABJc=;<br/>
+&nbsp;b=mV02SDopF4QOYeaHOHn4UHajAyNim1wxm9mo9xiyc3muPgA8CVQr5HwbqvT7esRoGek3bpg9jvOy/7cGWxE62s2+E6F1dyq1VJW+Phphm6VL2ZhxZgnhRqH5b5H+OjEt0mcUJeDSk/1Bq3HeIXdCKgCTwHbAo0UcxViKu50mKA9x9J90mhlH6ER8kCiNsbQu5OjjguoyLjxCXKhOcZEVuvLNhLmsghpcAclHYv5zw5kpwFEn6uHgYERBYcUyX8I9fJ//tulocpbHnpFxFTD+PMejT02SGAEK6+Jh8AwzruV/hddipaxmmW6/sK7EtnvTdQtAXOGgiS1d4imr5Nu5lA==<br/>
+ARC-Authentication-Results:&nbsp;i=2;&nbsp;mx.microsoft.com&nbsp;1;&nbsp;spf=pass&nbsp;(sender&nbsp;ip&nbsp;is<br/>
+&nbsp;40.107.192.75)&nbsp;smtp.rcpttodomain=harmonize-it.be&nbsp;smtp.mailfrom=adnm.net;<br/>
+&nbsp;dmarc=pass&nbsp;(p=quarantine&nbsp;sp=quarantine&nbsp;pct=100)&nbsp;action=none<br/>
+&nbsp;header.from=adnm.net;&nbsp;dkim=pass&nbsp;(signature&nbsp;was&nbsp;verified)&nbsp;header.d=adnm.net;<br/>
+&nbsp;arc=pass&nbsp;(0&nbsp;oda=1&nbsp;ltdi=1&nbsp;spf=[1,1,smtp.mailfrom=adnm.net]<br/>
+&nbsp;dkim=[1,1,header.d=adnm.net]&nbsp;dmarc=[1,1,header.from=adnm.net])<br/>
+Received:&nbsp;from&nbsp;AS8PR04CA0111.eurprd04.prod.outlook.com&nbsp;(2603:10a6:20b:31e::26)<br/>
+&nbsp;by&nbsp;AS8PR03MB7624.eurprd03.prod.outlook.com&nbsp;(2603:10a6:20b:348::12)&nbsp;with<br/>
+&nbsp;Microsoft&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,<br/>
+&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)&nbsp;id&nbsp;15.20.8026.18;&nbsp;Fri,&nbsp;4&nbsp;Oct<br/>
+&nbsp;2024&nbsp;11:53:26&nbsp;+0000<br/>
+Received:&nbsp;from&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+&nbsp;(2603:10a6:20b:31e:cafe::6d)&nbsp;by&nbsp;AS8PR04CA0111.outlook.office365.com<br/>
+&nbsp;(2603:10a6:20b:31e::26)&nbsp;with&nbsp;Microsoft&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,<br/>
+&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)&nbsp;id&nbsp;15.20.8026.18&nbsp;via&nbsp;Frontend<br/>
+&nbsp;Transport;&nbsp;Fri,&nbsp;4&nbsp;Oct&nbsp;2024&nbsp;11:53:26&nbsp;+0000<br/>
+Authentication-Results:&nbsp;spf=pass&nbsp;(sender&nbsp;IP&nbsp;is&nbsp;40.107.192.75)<br/>
+&nbsp;smtp.mailfrom=adnm.net;&nbsp;dkim=pass&nbsp;(signature&nbsp;was&nbsp;verified)<br/>
+&nbsp;header.d=adnm.net;dmarc=pass&nbsp;action=none&nbsp;header.from=adnm.net;compauth=pass<br/>
+&nbsp;reason=100<br/>
+Received-SPF:&nbsp;Pass&nbsp;(protection.outlook.com:&nbsp;domain&nbsp;of&nbsp;adnm.net&nbsp;designates<br/>
+&nbsp;40.107.192.75&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;receiver=protection.outlook.com;<br/>
+&nbsp;client-ip=40.107.192.75;&nbsp;helo=YT5PR01CU002.outbound.protection.outlook.com;<br/>
+&nbsp;pr=C<br/>
+Received:&nbsp;from&nbsp;YT5PR01CU002.outbound.protection.outlook.com&nbsp;(40.107.192.75)&nbsp;by<br/>
+&nbsp;AM2PEPF0001C711.mail.protection.outlook.com&nbsp;(10.167.16.181)&nbsp;with&nbsp;Microsoft<br/>
+&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)&nbsp;id<br/>
+&nbsp;15.20.7918.13&nbsp;via&nbsp;Frontend&nbsp;Transport;&nbsp;Fri,&nbsp;4&nbsp;Oct&nbsp;2024&nbsp;11:53:26&nbsp;+0000<br/>
+ARC-Seal:&nbsp;i=1;&nbsp;a=rsa-sha256;&nbsp;s=arcselector10001;&nbsp;d=microsoft.com;&nbsp;cv=none;<br/>
+&nbsp;b=YntIIeEaZ+CVxmjcSuRFAgQ1x7fgBNxBrHU7LjvYvmd/F4fcaeci8qGKJVs5mGYwTSBCbMNS+YbByEKjOz1zzSTsxRphrcocaNvxV1dCUHAt4tCram38IkgZC9o5zr7H0nXm75l/xkJerJCYRPMMW9Sp4DBlAbHmQ751LnjG1wrZnXcCnpQ8osIhoOul7UvPOB2nUDDqUx96DSKhJs1DSQSqLSQQOf++jb8Pdho7q8nrRx0wZGr5F4z9KmF1MHKZ7W2yYMASqqxfO9iEONeyIwWdvmhg1yEmmhVA2LLr+74u+xnwUVKHrUgTXxWpBs6y90+MhT3gsVd7OxDl7Fxojw==<br/>
+ARC-Message-Signature:&nbsp;i=1;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=microsoft.com;<br/>
+&nbsp;s=arcselector10001;<br/>
+&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;<br/>
+&nbsp;bh=RJjEMGZ6o0aBldmVjw/xfs9Z9RY3nXPj81prUv5ABJc=;<br/>
+&nbsp;b=rqfhYu4vIhBQRk3TlipIeTdy1Y7fSWQqSLiKg63P9V3hpFE2/GEpjCbYZUlTMKwLcao9xisO7t+fXGp0tmx3R5LTAwtjxUXMjlK3vqvekByhpmKHCSmLS/q5BtkCwaSbgNdnYn4IgUCdbCK2t/l/c60x+d8hlVWWMhw/FyhMMGw2BKevnlKGS2UxcDBwGSojUzOqTeVLhzKQ59Jpk3LhBktIfnIMRxsEDdkBkLnRCCQ0cqq8A6D5IWsF1nrXol86Vknx4cXTiNGn2lszFcpHhPf3RarIU5TsVsRQL0OgR0tDJNRlJYUrMT3Audx2oyR0fXKMfEeXMdVVwnqgR/jPEg==<br/>
+ARC-Authentication-Results:&nbsp;i=1;&nbsp;mx.microsoft.com&nbsp;1;&nbsp;spf=pass<br/>
+&nbsp;smtp.mailfrom=adnm.net;&nbsp;dmarc=pass&nbsp;action=none&nbsp;header.from=adnm.net;<br/>
+&nbsp;dkim=pass&nbsp;header.d=adnm.net;&nbsp;arc=none<br/>
+DKIM-Signature:&nbsp;v=1;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=adnm.net;&nbsp;s=selector1;<br/>
+&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;<br/>
+&nbsp;bh=RJjEMGZ6o0aBldmVjw/xfs9Z9RY3nXPj81prUv5ABJc=;<br/>
+&nbsp;b=yf2nZJ9SBGS9OfYHxMuRe0gAOfUQh3yDLmhjRzcW1mcDRR3X0pLrayeVfYSd7QAPs+8dSxKeyKpBl655VXVT/1HFg7dZW2l6Q+iq/wX7IC2MXO+ATbjcBqEpLkwaZy4TIHDDLDZGNa3mnRzo6LT6hE50H9OuqQKUcic7cSt7FF4ZGpo/StCSL7coIHsWXC+OeEdIkwpoA3oQxZBZCcM2GqnOH804oHaIUe9NVHA9GGKfABr8s/B5yM48BRs2FA7j/RgSeiHKyXgbuf+BFfA2CdDe4OyDirl2WZC+JcnQFrJEk6uUsbIfYHoxNgSZNfbntEpfMO3iwfwAGiy5p87HRg==<br/>
+Received:&nbsp;from&nbsp;YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM<br/>
+&nbsp;(2603:10b6:c01:38::20)&nbsp;by&nbsp;YT3PR01MB10558.CANPRD01.PROD.OUTLOOK.COM<br/>
+&nbsp;(2603:10b6:b01:95::19)&nbsp;with&nbsp;Microsoft&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,<br/>
+&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)&nbsp;id&nbsp;15.20.8026.19;&nbsp;Fri,&nbsp;4&nbsp;Oct<br/>
+&nbsp;2024&nbsp;11:53:22&nbsp;+0000<br/>
+Received:&nbsp;from&nbsp;YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM<br/>
+&nbsp;([fe80::1a99:c8a5:425:6a37])&nbsp;by&nbsp;YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM<br/>
+&nbsp;([fe80::1a99:c8a5:425:6a37%4])&nbsp;with&nbsp;mapi&nbsp;id&nbsp;15.20.8026.019;&nbsp;Fri,&nbsp;4&nbsp;Oct&nbsp;2024<br/>
+&nbsp;11:53:22&nbsp;+0000<br/>
+From:&nbsp;Receivables&nbsp;<receivables@adnm.net><br/>
+To:&nbsp;"finance@harmonize-it.be"&nbsp;<finance@harmonize-it.be>,&nbsp;Receivables<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<receivables@adnm.net><br/>
+Subject:&nbsp;VeroSoft&nbsp;Design&nbsp;(VSD)&nbsp;Inc.&nbsp;-&nbsp;Harmonize&nbsp;IT<br/>
+Thread-Topic:&nbsp;VeroSoft&nbsp;Design&nbsp;(VSD)&nbsp;Inc.&nbsp;-&nbsp;Harmonize&nbsp;IT<br/>
+Thread-Index:&nbsp;AQHbFlQDEznUyCWDb0qLdd3d1/As+Q==<br/>
+Date:&nbsp;Fri,&nbsp;4&nbsp;Oct&nbsp;2024&nbsp;11:53:22&nbsp;+0000<br/>
+Message-ID:<br/>
+&nbsp;<YQBPR0101MB5688F228E2377A7BAA88583394722@YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM><br/>
+Accept-Language:&nbsp;fr-FR,&nbsp;en-US<br/>
+Content-Language:&nbsp;en-US<br/>
+X-MS-Has-Attach:&nbsp;yes<br/>
+X-MS-TNEF-Correlator:<br/>
+Authentication-Results-Original:&nbsp;dkim=none&nbsp;(message&nbsp;not&nbsp;signed)<br/>
+&nbsp;header.d=none;dmarc=none&nbsp;action=none&nbsp;header.from=adnm.net;<br/>
+x-ms-exchange-messagesentrepresentingtype:&nbsp;1<br/>
+x-ms-traffictypediagnostic:<br/>
+&nbsp;YQBPR0101MB5688:EE_|YT3PR01MB10558:EE_|AM2PEPF0001C711:EE_|AS8PR03MB7624:EE_|VI1PR03MB9899:EE_<br/>
+X-MS-Office365-Filtering-Correlation-Id:&nbsp;3aea6398-e052-49d1-efa2-08dce46b27f6<br/>
+x-ms-exchange-senderadcheck:&nbsp;1<br/>
+x-ms-exchange-antispam-relay:&nbsp;0<br/>
+X-Microsoft-Antispam-Untrusted:<br/>
+&nbsp;BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;<br/>
+X-Microsoft-Antispam-Message-Info-Original:<br/>
+&nbsp;=?us-ascii?Q?M/HrmMjRAR5sEiTA46SzgHu6coBamvWdTHno9qCUpirm6Oj4CGgf2a94Z9yQ?=<br/>
+&nbsp;=?us-ascii?Q?ortaFZsk6bq4H91oU7/JTDoWA7ySzClb40c3F5UEaNX+t+0ReicqGMLCsG6P?=<br/>
+&nbsp;=?us-ascii?Q?piGcMq7wF7ZQ5+t7YG+gX71tMG91vyagJmo70sTahqyWe6KPKC0DEPq6l3eB?=<br/>
+&nbsp;=?us-ascii?Q?13HX8a9x4jD8Yw85HUb6g3H8uzVJPC33vRxdgIEYaZtLEPdYgT+n+9E2Ha7b?=<br/>
+&nbsp;=?us-ascii?Q?QdU/iHtL0GWPPJZv6n8Ec1DXL5fJJ+nFRqafr8UMcz4RPqoljDVk94FmYyiY?=<br/>
+&nbsp;=?us-ascii?Q?ZEVPATOIdHWA9CKh/3TwbOlf4aO9Q47AF1/uc5P//KnwthMjpahtk+S2vZoZ?=<br/>
+&nbsp;=?us-ascii?Q?Dal6AoNUf/0IhpqXjycMViM5/AZeUP6O9tN5VC0QZZRKWrHKt4aAdLR932JE?=<br/>
+&nbsp;=?us-ascii?Q?DPX1ZpMInET+zUzFzBpGbecDxGJnYaVEx28gKytF6wKzBPvZi+gUwEsRMCyW?=<br/>
+&nbsp;=?us-ascii?Q?7C0izRhE/k9cc516BlvmxkzUD/ueaCLxZ419S3BiFdzSWLVRCS1jHksFy0SP?=<br/>
+&nbsp;=?us-ascii?Q?xN+OJkafRxwwn71/vIBtPCr1I16IJ2tmENxIHFWJ9kgwGHmZSkG+i1Y/9vi/?=<br/>
+&nbsp;=?us-ascii?Q?jBKx36LXmwifID0RHSVOqoJokwAOSQQb+bmtoM5AWAc3xNEYt0LxbRYHNKtq?=<br/>
+&nbsp;=?us-ascii?Q?GtBEqyNX+of5WkO9DRLkGrAJGvxBywide/UztazlqIy7EW2i6MZ0uHK1lTQG?=<br/>
+&nbsp;=?us-ascii?Q?lajbxMhRJHhpEIBGIcbpHWQ7UVwWrv0jUxvtFEMma5NlDkNi4JcZYuNek4iU?=<br/>
+&nbsp;=?us-ascii?Q?yQm+lynZdITgWMIhDFtVfyLGzTvQPO7IJPwj0HwdP2veAKEgp8JotNmQC0us?=<br/>
+&nbsp;=?us-ascii?Q?kx1mSu0Rin2ZlSzsGmRxva1MqUVMdMxGMiPrVrH/2k6Lp9tZ8JDxECKrnQM/?=<br/>
+&nbsp;=?us-ascii?Q?1D+r6myLpREI6Bh2BrtbmFfXIalf7+j6WaFcH5oKJwWHAeQhwSd2EpetxU3Z?=<br/>
+&nbsp;=?us-ascii?Q?YENaQg3Ln7JHAXAy4j2K6/kR7dODdrRxY8cxojnv8j1MTyOSejrWQnsJirpV?=<br/>
+&nbsp;=?us-ascii?Q?wft690WqLF7zma1l7LQanbaVrbh1HIVQFjVYWokeZvinYD4resF1+lAKmq15?=<br/>
+&nbsp;=?us-ascii?Q?uBFjrY8jIiQhzAgzpv2aAaVTwitWn8ACGMJ3rUUJmLFGkgPCQURvcCPWUKq5?=<br/>
+&nbsp;=?us-ascii?Q?0CaHU5HfCQsOGwU6jPHN50Pm5oUTVATTbNfMelrWX8zVb9ZtEhc02aU7CVET?=<br/>
+&nbsp;=?us-ascii?Q?CFRTpUM/luDQC2JAUBnApDMYvUZhHzctNN0i4tNhHkSmzlRh/iizvgaclOiV?=<br/>
+&nbsp;=?us-ascii?Q?jYYvnqhNHvJLFcDKQ3UCvdQ9iTw2gwJUTvh62WSACw=3D=3D?=<br/>
+X-Forefront-Antispam-Report-Untrusted:<br/>
+&nbsp;CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1102;<br/>
+X-MS-Exchange-AntiSpam-MessageData-Original-ChunkCount:&nbsp;1<br/>
+X-MS-Exchange-AntiSpam-MessageData-Original-0:<br/>
+&nbsp;=?us-ascii?Q?geRh+QBXUwgJOUMtZzSwzwSLqQGzstNznu2llP2AIr/hTQUDB+XtDoBvC1yO?=<br/>
+&nbsp;=?us-ascii?Q?zh3cv8KUBSWPvLL2zba2AB5ci3q0ohJPs/s9CKplRZpTTWWQj67OE7QfmjjD?=<br/>
+&nbsp;=?us-ascii?Q?PMLQgiuo/QT5pjMCLTgtaEvxnQItkgu3vo8AvXCHB4N6uOxIkgxJLC8Ktai2?=<br/>
+&nbsp;=?us-ascii?Q?dhgMFLfA2dRbeQxQTRC9GjkCzyXu8OiWBtHQeoYANxQGSG7820iAXSoWhKUR?=<br/>
+&nbsp;=?us-ascii?Q?CVrfFjTGIAQjRiCj3FQVYR+JP3wKvTFbzSJXgeDTfgagEkJq2Dm6tFyhdttj?=<br/>
+&nbsp;=?us-ascii?Q?kV/+1+sElyg5qiRIDV9tucQzb/hkBdCmE6GiQaxH6NMmq4ky+ewydPNJmNnt?=<br/>
+&nbsp;=?us-ascii?Q?yPKzOlNZFEKIUdKE5JlMb5KHDaQoot1akkK10CVxQ26Fb6Mb1TxZ9cnbiUwc?=<br/>
+&nbsp;=?us-ascii?Q?ktceiKHgadNvoETcQ4cCA3+z5MStoPP09GewoPu/EdQAB2E/b1wAeAdxLs7k?=<br/>
+&nbsp;=?us-ascii?Q?iKn1d7dvaMmqCjLQVC629fPzMMacFig+t5UGccRsnSnBvKNurhxSCtEgQ6i3?=<br/>
+&nbsp;=?us-ascii?Q?PnxUuoAdFWl9lnVcC9ICzH2W4aCXwWkq8GPzWO5mQuC3VzB2jBByyk4IBdJg?=<br/>
+&nbsp;=?us-ascii?Q?1jGILmZ/qd4Jk00LHpPEDFpvn6suuOChFuLPI+JI3aUu0TQebwdU7JjUf6s4?=<br/>
+&nbsp;=?us-ascii?Q?5djcneT9xmS/jSeUMTnhPAtNHWAsKFJj2NlVVGjMKtGulpCIvnjnxut+9NMI?=<br/>
+&nbsp;=?us-ascii?Q?Fc8iq0f0GpnWHpnMdD3NUs8vavoFpdn5/fFjUhWV0UJeOOM1n0w6tOgZt8Nz?=<br/>
+&nbsp;=?us-ascii?Q?vhLirjCTGp90tUOoqi8Qxc40H/wH+9pMvC2ZikGvaf5Je+uNcfQslJQezlL2?=<br/>
+&nbsp;=?us-ascii?Q?Xc2PW0IG1f3YIBQCdeMKI8K0c4KBSVAzqo1ZXFw3QbiSWz3so8hN6EC6LEoB?=<br/>
+&nbsp;=?us-ascii?Q?14+tccyh+aJrrG66uX64d5B0CdGX3P5KDdXlPL4HNYWiwEK+G9t9ONGcNX7m?=<br/>
+&nbsp;=?us-ascii?Q?92HnyzoZqhvGOzdXzyxPW0n5a5Ksg7bPqOAg/bBPhxeSBEgRyCBFvYpu7wJb?=<br/>
+&nbsp;=?us-ascii?Q?0o9QDg7U//ReKy0ZwERuNFHQsS/lyrZIqjhspz/DAWnMtLcfTmn9io51kLFA?=<br/>
+&nbsp;=?us-ascii?Q?Tgxz+KfUoJs+CyLJr7xroHkl093gUJKBygAQPE3YvmZQ2TmoSlYWLHQKped6?=<br/>
+&nbsp;=?us-ascii?Q?QLWDBieJgjf/McuXT7PSYCanzR+sncpXErKtTrPeaWxKDiAqoeyxUujs/PYg?=<br/>
+&nbsp;=?us-ascii?Q?4/ObJlZe7mw//5ocwN9riPbgV2U/gJzN+9cpCR4boGl7Ry6Q1AZPrXASeh1O?=<br/>
+&nbsp;=?us-ascii?Q?zVmXXdxUWQz6WRpBwNuPzVMS6BMP7wstJ41Irwvt8ADlXipJkIr68peAhvTD?=<br/>
+&nbsp;=?us-ascii?Q?eRRnCZ9zeolTyVHUXTN59dVd8IZRa3tH2ex85y16X8OlWBH7XzX9A/nLc00a?=<br/>
+&nbsp;=?us-ascii?Q?gV2QKAbMds8BEaOGI+lXTNIKMrgzxhfg2guTwtXDQcJgf/2+mIRRmn9ORvB+?=<br/>
+&nbsp;=?us-ascii?Q?zw8L5XhugsXiGt0jIIMenL2s5UDceuY1/v/O2wCxAhNgFZ02aIkbgfKwnwT8?=<br/>
+&nbsp;=?us-ascii?Q?mWAzyOYEt0FJMykCClBATn0rCFBP4WTEasHMk+xY83A1g8DUMNfJw11TV0XN?=<br/>
+&nbsp;=?us-ascii?Q?faPnZgdSekfWZrg8n3Wg804zDYKZd3D9MJo1tUlhiGWod7Nf0YX90lhBEkw/?=<br/>
+&nbsp;=?us-ascii?Q?qdDkwmhaF09PqkWg4e3U8Zs=3D?=<br/>
+Content-Type:&nbsp;multipart/mixed;<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;boundary="_004_YQBPR0101MB5688F228E2377A7BAA88583394722YQBPR0101MB5688_"<br/>
+MIME-Version:&nbsp;1.0<br/>
+X-MS-Exchange-Transport-CrossTenantHeadersStamped:&nbsp;YT3PR01MB10558<br/>
+Return-Path:&nbsp;receivables@adnm.net<br/>
+X-MS-Exchange-Organization-ExpirationStartTime:&nbsp;04&nbsp;Oct&nbsp;2024&nbsp;11:53:26.2896<br/>
+&nbsp;(UTC)<br/>
+X-MS-Exchange-Organization-ExpirationStartTimeReason:&nbsp;OriginalSubmit<br/>
+X-MS-Exchange-Organization-ExpirationInterval:&nbsp;1:00:00:00.0000000<br/>
+X-MS-Exchange-Organization-ExpirationIntervalReason:&nbsp;OriginalSubmit<br/>
+X-MS-Exchange-Organization-Network-Message-Id:<br/>
+&nbsp;3aea6398-e052-49d1-efa2-08dce46b27f6<br/>
+X-EOPAttributedMessage:&nbsp;0<br/>
+X-EOPTenantAttributedMessage:&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c:0<br/>
+X-MS-Exchange-Organization-MessageDirectionality:&nbsp;Incoming<br/>
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:<br/>
+&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+X-MS-Exchange-Transport-CrossTenantHeadersPromoted:<br/>
+&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+X-MS-PublicTrafficType:&nbsp;Email<br/>
+X-MS-Exchange-Organization-AuthSource:<br/>
+&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+X-MS-Exchange-Organization-AuthAs:&nbsp;Anonymous<br/>
+X-MS-Office365-Filtering-Correlation-Id-Prvs:<br/>
+&nbsp;e3c26112-044d-43e2-ac36-08dce46b25c8<br/>
+X-MS-Exchange-AtpMessageProperties:&nbsp;SA|SL<br/>
+X-MS-Exchange-Organization-SCL:&nbsp;1<br/>
+X-Microsoft-Antispam:&nbsp;BCL:0;ARA:13230040|35042699022|5073199012|4073199012;<br/>
+X-Forefront-Antispam-Report:<br/>
+&nbsp;CIP:40.107.192.75;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YT5PR01CU002.outbound.protection.outlook.com;PTR:mail-canadacentralazon11021075.outbound.protection.outlook.com;CAT:NONE;SFS:(13230040)(35042699022)(5073199012)(4073199012);DIR:INB;<br/>
+X-MS-Exchange-CrossTenant-OriginalArrivalTime:&nbsp;04&nbsp;Oct&nbsp;2024&nbsp;11:53:26.0552<br/>
+&nbsp;(UTC)<br/>
+X-MS-Exchange-CrossTenant-Network-Message-Id:&nbsp;3aea6398-e052-49d1-efa2-08dce46b27f6<br/>
+X-MS-Exchange-CrossTenant-Id:&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c<br/>
+X-MS-Exchange-CrossTenant-AuthSource:<br/>
+&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+X-MS-Exchange-CrossTenant-AuthAs:&nbsp;Anonymous<br/>
+X-MS-Exchange-CrossTenant-FromEntityHeader:&nbsp;Internet<br/>
+X-MS-Exchange-Transport-CrossTenantHeadersStamped:&nbsp;AS8PR03MB7624<br/>
+X-MS-Exchange-Transport-EndToEndLatency:&nbsp;00:00:17.9423298<br/>
+X-MS-Exchange-Processed-By-BccFoldering:&nbsp;15.20.8026.016<br/>
+X-Microsoft-Antispam-Mailbox-Delivery:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;ucf:0;jmr:0;ex:1;auth:0;dest:J;OFR:SpamFilterAuthJ;ENG:(910001)(944506478)(944626604)(920097)(890001)(255002)(435001)(930097)(3100021)(140003)(1420198);RF:JunkEmail;<br/>
+X-Microsoft-Antispam-Message-Info:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?qx6EkDu91DD47bMft78xj8H0RBlAM7zf2NKFbeW2z129QqFBjTf1t0jmrhLX?=<br/>
+&nbsp;=?us-ascii?Q?CuP+WimdKebjKk45/y3fBKUXpkncHyjdxW4MjqjkY+/ymnHyGyK4dhR/ZPaa?=<br/>
+&nbsp;=?us-ascii?Q?RDyjqQF+MgWwE3pjwYIAsnl30OORKwOn8DIi5FUhQVEJfdAJfcB+RMmPa5D/?=<br/>
+&nbsp;=?us-ascii?Q?hpY0Qu9uevIAVWLcqSk6D1t+qnzwomDTfzBANFzc58VIBaLKorsUD0B/stPy?=<br/>
+&nbsp;=?us-ascii?Q?VJiICXRQuVOw8BO71g0KgfogBalDVr0PCZjHxHssGGu98XVPOrwSdGKfDAgQ?=<br/>
+&nbsp;=?us-ascii?Q?UsyiZW7x3DT1svDh7o90eEQHsFMSgYjYMoOQZqWQK75qrWLQnBxfrXR13+mj?=<br/>
+&nbsp;=?us-ascii?Q?J6fl2LBgDMWnpHbD6pbEm3yxMM70Zp96MCSDnE1B8/cYkyXsaA+epxOoQGqz?=<br/>
+&nbsp;=?us-ascii?Q?xoG2+EzzuEggglL0ePNzO4OlBhaUjRrpo76Q0XOV6LPztCL4A0kn7x813FY9?=<br/>
+&nbsp;=?us-ascii?Q?WmnhbEFIrPU9nAfnPEgHRJUKJUlfaEOpjnJxbzPSrL2QjYJna8PNRSn+NHnG?=<br/>
+&nbsp;=?us-ascii?Q?OKXWXDS3eNsUvPAZVVfcVNhZpU+x2hYYp+Hb7M26hl+ZU3qxXgmy9bd1UmvW?=<br/>
+&nbsp;=?us-ascii?Q?wtJ/Mnc56p4OotBOoyMp5zdE0+g3vFGWjwCUD+tQxe7Ai3Jpi+0nVbRDdjxX?=<br/>
+&nbsp;=?us-ascii?Q?yY72Uq93/HCnZeBREdtwwQOw1KwigRgaRqHxWMkMyRtmzEe0GtbgFmsgjqTu?=<br/>
+&nbsp;=?us-ascii?Q?VbiBEfSAWws89CGwt5SYxd4dgSYiXK5ko6XGKYtr0b0C/AhWHL+Tn+ybT1+y?=<br/>
+&nbsp;=?us-ascii?Q?cdAWxhbQgdkx+XK6oHfZMDZRwbkuoMOIpgY87NDSg9dCemCxvjUJlnb0KLrO?=<br/>
+&nbsp;=?us-ascii?Q?tgU5AfTwYrB5L60HlquY2s6ELEvyVfK0xaXUsnoX5+BKexVYjcw8Y2jw4WKn?=<br/>
+&nbsp;=?us-ascii?Q?xA6aROK6eBsOff8GmZgNNfD26UaWk7/Z2IVTcy4nZqODFWjUrdptx8D3ECdh?=<br/>
+&nbsp;=?us-ascii?Q?v470pUjqPhMzyDWsaE1o2kYLJhjEmoUwbbTlCicnaIZe694ikNwJ3o0IWnRz?=<br/>
+&nbsp;=?us-ascii?Q?z1gx6MAM9Cpltnvxyo3GxJNrdIffZQ8Bz9a5EoMdzvD56P+KAiaoGu07MYaQ?=<br/>
+&nbsp;=?us-ascii?Q?yzHZMaPGgBwzD5l7hh3R1l7+C0JP7gHzmaWo1EMi6nzm/t7n1q/N5nxSOszu?=<br/>
+&nbsp;=?us-ascii?Q?UbfzRM/aIdLlhjdQtq4ChmeQ8GnHx8ryyM8nGRYxdmPOnq3He936cveuBwMk?=<br/>
+&nbsp;=?us-ascii?Q?2MBbuWHtWzgtgNN8vR/pZWw/35zKivuery5DmtjRq58wqBZBCwNdui7YDQUf?=<br/>
+&nbsp;=?us-ascii?Q?AXBqxvHJ1/6YoI898KWCFNvESxXjG8MbaMgntlEVop8X+1ME787zyCSxcSP0?=<br/>
+&nbsp;=?us-ascii?Q?8V+BO/EY1cYTquF+l4ctG+PcFLlG9jyBQ8P2vRZ8ed9LkkCQcJdYMyKi0jjR?=<br/>
+&nbsp;=?us-ascii?Q?ItRNgI91bt7tDCM102/7e5UghK7xu/24QtuNdULEvSrQbErN+UXDGaC8BYuT?=<br/>
+&nbsp;=?us-ascii?Q?1O2PkchKhs53v08U3N2zAQlEG3jbKJ5G5kGx0sF7fq4sI+Jix4SStgynPo4X?=<br/>
+&nbsp;=?us-ascii?Q?4DfQLSCCv+xxQPGPATLAYLmTlC2HlZ44+Tcp4ckU4Q1M2pHJUW3lGUe/zdxr?=<br/>
+&nbsp;=?us-ascii?Q?tLMeDkMnKYaVU7acT+tx0V0UhZH57ECA6LQWH+hMHv/UljlKlqzdxtgbXs0z?=<br/>
+&nbsp;=?us-ascii?Q?IucSBhCFmeJwVB+8M4jx0tod6vF8+dDb2bUC9KSUSV6dL3fo3UAkSlrQ19jj?=<br/>
+&nbsp;=?us-ascii?Q?8o6mdhNFPaCRZqneruH/b9/pnAuouUvtRCS+fOzo95ZPao4S/vT9wxvIPoWk?=<br/>
+&nbsp;=?us-ascii?Q?ISTgghMYOA7yEnLTIGy5Y55fscpZUnRpQrUoazG6Xn+TktblvwBBdYydmjKG?=<br/>
+&nbsp;=?us-ascii?Q?oSPe6fSfhJ50MusVZE5h//dXCbJe9M54H5cVmAmM5ZU3mqRq0Ik0EbEjFU6d?=<br/>
+&nbsp;=?us-ascii?Q?AqrLYl/pk1fbdDDouK0oBIBvT2AiFrvmKRC5gbeoLa+GGbC9DiBkzhQFSUVh?=<br/>
+&nbsp;=?us-ascii?Q?mJCrEOnAGgWKIaO2//QokSfwqpRQElrBfMtGnBIQZ8gVB0HSY8Dw02qRNVWF?=<br/>
+&nbsp;=?us-ascii?Q?Srpt6p1oMBPIFfwOCeEyOysPdF5wuwgb7JQiynKSEaK2Qfmf/gEGReVwqwyT?=<br/>
+&nbsp;=?us-ascii?Q?NGL4Hpyw6Zvwps/RVECEs1EjcRPPqYDAAV5o7iBeN0SJRIjSvDu5YVcrBzlI?=<br/>
+&nbsp;=?us-ascii?Q?nz/zpaEIOw+OycZsNnBSspMGCYyGeZLyTg=3D=3D?=<br/>
+
+            </code>
+            </blockquote>
+          </details>
+        </article>
+        <br/>
+    </div>
+    <br/>
+<div><hr/><br/>
+(1)&nbsp;Test:&nbsp;<font class="text-cyan">Received&nbsp;-&nbsp;Mail&nbsp;Servers&nbsp;Flow</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Received<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;List&nbsp;of&nbsp;server&nbsp;hops&nbsp;used&nbsp;to&nbsp;deliver&nbsp;message:<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;(0)&nbsp;<font class="text-yellow">From:&nbsp;<font class="text-green">Receivables&nbsp;&amp;lt;receivables@adnm.net&amp;gt;&lt;/font&gt;</font><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(1)&nbsp;<font class="text-green">YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rev-DNS:&nbsp;&nbsp;<font class="text-yellow">[fe80::1a99:c8a5:425:6a37]</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-10-04&nbsp;11:53:22+00:00<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">fuzzy&nbsp;match:&nbsp;Exchange&nbsp;Server&nbsp;2019&nbsp;CU11;&nbsp;October&nbsp;12,&nbsp;2021;&nbsp;15.2.986.9</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM&nbsp;([fe80::1a99:c8a5:425:6a37%4])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapi<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extra:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;[fe80::1a99:c8a5:425:6a37%4]<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(2)&nbsp;<font class="text-yellow">YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rev-DNS:&nbsp;&nbsp;<font class="text-yellow">2603:10b6:c01:38::20</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-10-04&nbsp;11:53:22+00:00<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;Exchange&nbsp;Server&nbsp;2019&nbsp;CU11;&nbsp;October&nbsp;12,&nbsp;2021;&nbsp;15.2.986.9</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;YT3PR01MB10558.CANPRD01.PROD.OUTLOOK.COM&nbsp;(2603:10b6:b01:95::19)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-red">Microsoft</font>&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extra:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;2603:10b6:b01:95::19<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(3)&nbsp;<font class="text-yellow">YT5PR01CU002.outbound.protection.outlook.com</font>&nbsp;(<font class="text-yellow">40.107.192.75</font>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rev-DNS:&nbsp;&nbsp;<font class="text-yellow">mail-canadacentralazon11021075.outbound.protection.outlook.com</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-10-04&nbsp;11:53:26+00:00<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;Exchange&nbsp;Server&nbsp;2019&nbsp;CU11;&nbsp;October&nbsp;12,&nbsp;2021;&nbsp;15.2.986.9</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AM2PEPF0001C711.mail.protection.outlook.com&nbsp;(10.167.16.181)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-red">Microsoft</font>&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;via:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Frontend&nbsp;Transport<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extra:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(4)&nbsp;<font class="text-yellow">AM2PEPF0001C711.eurprd05.prod.outlook.com</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rev-DNS:&nbsp;&nbsp;<font class="text-yellow">2603:10a6:20b:31e:cafe::6d</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-10-04&nbsp;11:53:26+00:00<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;Exchange&nbsp;Server&nbsp;2019&nbsp;CU11;&nbsp;October&nbsp;12,&nbsp;2021;&nbsp;15.2.986.9</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AS8PR04CA0111.outlook.<font class="text-red">office365</font>.com&nbsp;(2603:10a6:20b:31e::26)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-red">Microsoft</font>&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;via:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Frontend&nbsp;Transport<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extra:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;2603:10a6:20b:31e::26<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(5)&nbsp;<font class="text-yellow">AS8PR04CA0111.eurprd04.prod.outlook.com</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rev-DNS:&nbsp;&nbsp;<font class="text-yellow">2603:10a6:20b:31e::26</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-10-04&nbsp;11:53:26+00:00<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;fuzzy&nbsp;match:&nbsp;Exchange&nbsp;Server&nbsp;2019&nbsp;CU11;&nbsp;October&nbsp;12,&nbsp;2021;&nbsp;15.2.986.9</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AS8PR03MB7624.eurprd03.prod.outlook.com&nbsp;(2603:10a6:20b:348::12)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-red">Microsoft</font>&nbsp;SMTP&nbsp;Server&nbsp;(version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extra:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;2603:10a6:20b:348::12<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;version=TLS1_2,&nbsp;cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(6)&nbsp;<font class="text-yellow">AS8PR03MB7624.eurprd03.prod.outlook.com</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rev-DNS:&nbsp;&nbsp;<font class="text-yellow">2603:10a6:20b:348::12</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-10-04&nbsp;11:53:43+00:00<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VI1PR03MB9899.eurprd03.prod.outlook.com<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HTTPS<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|_>&nbsp;(8)&nbsp;<font class="text-yellow">To:&nbsp;<font class="text-green">&amp;quot;finance@harmonize-it.be&amp;quot;&nbsp;&amp;lt;finance@harmonize-it.be&amp;gt;,&nbsp;Receivables<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&amp;lt;receivables@adnm.net&amp;gt;&lt;/font&gt;</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(2)&nbsp;Test:&nbsp;<font class="text-cyan">Extracted&nbsp;IP&nbsp;addresses</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Extracted&nbsp;IP&nbsp;addresses&nbsp;from&nbsp;headers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">40.107.192.75</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">10.167.16.181</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;IP&nbsp;address:&nbsp;<font class="text-magenta">255.255.255.255</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(3)&nbsp;Test:&nbsp;<font class="text-cyan">Extracted&nbsp;Domains</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Extracted&nbsp;domains&nbsp;from&nbsp;headers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">255.255.255.255</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">17.9423298</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8026.019</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">AM2PEPF0001C711.eurprd05.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">harmonize-it.be</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">26.2896</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">40.107.192.75</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8026.19</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">VI1PR03MB9899.eurprd03.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">adnm.net</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">26.0552</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">AS8PR04CA0111.outlook.&lt;font&nbsp;class=&quot;text-red&quot;&gt;office365&lt;/font&gt;.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">AS8PR03MB7624.eurprd03.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8026.016</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">10.167.16.181</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">YT5PR01CU002.outbound.protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">AS8PR04CA0111.eurprd04.prod.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.7918.13</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">YT3PR01MB10558.CANPRD01.PROD.OUTLOOK.COM</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">mail-canadacentralazon11021075.outbound.protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow"><font class="text-red">microsoft&lt;/font&gt;.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">mx.<font class="text-red">microsoft&lt;/font&gt;.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">AM2PEPF0001C711.mail.protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">00.0000000</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">smtp.rcpttodomain</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Found&nbsp;Domain:&nbsp;&nbsp;&nbsp;<font class="text-yellow">15.20.8026.18</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(4)&nbsp;Test:&nbsp;<font class="text-cyan">Received-SPF</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Received-SPF<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Pass&nbsp;(protection.outlook.com:&nbsp;domain&nbsp;of&nbsp;adnm.net&nbsp;designates&nbsp;40.107.192.75&nbsp;as&nbsp;permitted&nbsp;sender)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;receiver=protection.outlook.com;&nbsp;client-ip=40.107.192.75;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;helo=YT5PR01CU002.outbound.protection.outlook.com;&nbsp;pr=C<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Decomposition:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Pass&nbsp;(protection.outlook.com:&nbsp;domain&nbsp;of&nbsp;adnm.net&nbsp;designates&nbsp;40.107.192.75&nbsp;as&nbsp;permitted&nbsp;sender)&nbsp;receiver:&nbsp;<font class="text-yellow">protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">client-ip</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<font class="text-green">40.107.192.75</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;helo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<font class="text-yellow">YT5PR01CU002.outbound.protection.outlook.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;pr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<font class="text-yellow">C</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(5)&nbsp;Test:&nbsp;<font class="text-cyan">X-Forefront-Antispam-Report</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Forefront-Antispam-Report<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;CIP:40.107.192.75;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YT5PR01CU002.outbound.protection.ou<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;tlook.com;PTR:mail-canadacentralazon11021075.outbound.protection.outlook.com;CAT:NONE;SFS:(1323<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;0040)(35042699022)(5073199012)(4073199012);DIR:INB;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Microsoft&nbsp;Office365/Exchange&nbsp;ForeFront&nbsp;Anti-Spam&nbsp;report<br/>
+<br/>
+-&nbsp;<font class="text-magenta">CIP</font>:&nbsp;Connecting&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">40.107.192.75</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">CTRY</font>:&nbsp;The&nbsp;source&nbsp;country&nbsp;as&nbsp;determined&nbsp;by&nbsp;the&nbsp;connecting&nbsp;IP&nbsp;address<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;CA<br/>
+<br/>
+-&nbsp;<font class="text-magenta">LANG</font>:&nbsp;The&nbsp;language&nbsp;in&nbsp;which&nbsp;the&nbsp;message&nbsp;was&nbsp;written<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;en<br/>
+<br/>
+-&nbsp;<font class="text-magenta">IPV</font>:&nbsp;Ingress&nbsp;Peer&nbsp;Verification&nbsp;status<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NLI:&nbsp;The&nbsp;IP&nbsp;address&nbsp;was&nbsp;not&nbsp;found&nbsp;on&nbsp;any&nbsp;IP&nbsp;reputation&nbsp;list.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SFV</font>:&nbsp;Message&nbsp;Filtering<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NSPM:&nbsp;<font class="text-green">Spam&nbsp;filtering&nbsp;marked&nbsp;the&nbsp;message&nbsp;as&nbsp;non-spam&nbsp;and&nbsp;the&nbsp;message&nbsp;was&nbsp;sent&nbsp;to&nbsp;the&nbsp;intended&nbsp;recipients.</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">H</font>:&nbsp;The&nbsp;HELO&nbsp;or&nbsp;EHLO&nbsp;string&nbsp;of&nbsp;the&nbsp;connecting&nbsp;email&nbsp;server.<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;YT5PR01CU002.outbound.protection.outlook.com<br/>
+<br/>
+-&nbsp;<font class="text-magenta">PTR</font>:&nbsp;Reverse&nbsp;DNS&nbsp;of&nbsp;the&nbsp;Connecting&nbsp;IP&nbsp;peer's&nbsp;address<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;mail-canadacentralazon11021075.outbound.protection.outlook.com<br/>
+<br/>
+-&nbsp;<font class="text-magenta">CAT</font>:&nbsp;The&nbsp;category&nbsp;of&nbsp;protection&nbsp;policy<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NONE:&nbsp;<font class="text-green">Clean&nbsp;message</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">DIR</font>:&nbsp;Direction&nbsp;of&nbsp;email&nbsp;verification<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;INB:&nbsp;Inbound&nbsp;email&nbsp;verification<br/>
+<br/>
+-&nbsp;Message&nbsp;matched&nbsp;<font class="text-yellow">5</font>&nbsp;Anti-Spam&nbsp;rules&nbsp;(<font class="text-magenta">SFS</font>):<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(13230040)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(35042699022)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(4073199012)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(5073199012)<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SCL</font>:&nbsp;Spam&nbsp;Confidence&nbsp;Level:&nbsp;1<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Not&nbsp;spam</font>:&nbsp;The&nbsp;message&nbsp;skipped&nbsp;spam&nbsp;filtering<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(6)&nbsp;Test:&nbsp;<font class="text-cyan">X-MS-Exchange-Organization-SCL</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-Organization-SCL<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;1<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SCL</font>:&nbsp;Spam&nbsp;Confidence&nbsp;Level:&nbsp;1<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Not&nbsp;spam</font>:&nbsp;The&nbsp;message&nbsp;skipped&nbsp;spam&nbsp;filtering<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(7)&nbsp;Test:&nbsp;<font class="text-cyan">X-Microsoft-Antispam-Mailbox-Delivery</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Microsoft-Antispam-Mailbox-Delivery<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;ucf:0;jmr:0;ex:1;auth:0;dest:J;OFR:SpamFilterAuthJ;ENG:(910001)(944506478)(944626604)(920097)(89000<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;1)(255002)(435001)(930097)(3100021)(140003)(1420198);RF:JunkEmail;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;This&nbsp;header&nbsp;denotes&nbsp;where&nbsp;to&nbsp;move&nbsp;received&nbsp;message.&nbsp;Informs&nbsp;about&nbsp;applied&nbsp;Mail&nbsp;Rules,&nbsp;target&nbsp;directory&nbsp;in&nbsp;user's&nbsp;Inbox.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">ucf</font>:&nbsp;User&nbsp;Custom&nbsp;Flow&nbsp;(?)&nbsp;-&nbsp;custom&nbsp;mail&nbsp;flow&nbsp;rule&nbsp;applied&nbsp;on&nbsp;message?<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;0:&nbsp;No&nbsp;user&nbsp;custom&nbsp;mail&nbsp;rule&nbsp;applied.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">jmr</font>:&nbsp;Junk&nbsp;Mail&nbsp;Rule&nbsp;(?)&nbsp;-&nbsp;mail&nbsp;considered&nbsp;as&nbsp;Spam&nbsp;by&nbsp;previous,&nbsp;existing&nbsp;mail&nbsp;rules?<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;0:&nbsp;<font class="text-cyan">Mail&nbsp;not&nbsp;marked&nbsp;as&nbsp;Junk&nbsp;by&nbsp;mail&nbsp;rules.</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">ex</font>:&nbsp;Unknown<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;1:&nbsp;Unknown<br/>
+<br/>
+-&nbsp;<font class="text-magenta">auth</font>:&nbsp;Message&nbsp;originating&nbsp;from&nbsp;Authenticated&nbsp;sender<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;0:&nbsp;Not&nbsp;Authenticated<br/>
+<br/>
+-&nbsp;<font class="text-magenta">dest</font>:&nbsp;Destination&nbsp;where&nbsp;message&nbsp;should&nbsp;be&nbsp;placed<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;J:&nbsp;<font class="text-red">JUNK&nbsp;directory</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">ofr</font>:&nbsp;Outlook&nbsp;Filter&nbsp;Rules&nbsp;applied&nbsp;on&nbsp;this&nbsp;Message<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;SpamFilterAuthJ:&nbsp;<font class="text-yellow">This&nbsp;message&nbsp;was&nbsp;marked&nbsp;as&nbsp;spam&nbsp;using&nbsp;a&nbsp;junk&nbsp;filter&nbsp;other&nbsp;than&nbsp;the&nbsp;Outlook&nbsp;Junk&nbsp;Email&nbsp;filter.</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">rf</font>:&nbsp;Email&nbsp;Rules<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;JunkEmail:&nbsp;<font class="text-red">Mail&nbsp;marked&nbsp;as&nbsp;Junk&nbsp;and&nbsp;moved&nbsp;to&nbsp;Junk&nbsp;folder</font><br/>
+<br/>
+-&nbsp;Message&nbsp;matched&nbsp;<font class="text-yellow">12</font>&nbsp;Anti-Spam&nbsp;Delivery&nbsp;rules&nbsp;(<font class="text-magenta">ENG</font>):<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(140003)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(1420198)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(255002)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(3100021)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(435001)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(890001)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(910001)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(920097)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(930097)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(944506478)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(944626604)<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(8)&nbsp;Test:&nbsp;<font class="text-cyan">X-Microsoft-Antispam&nbsp;Bulk&nbsp;Mail</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Microsoft-Antispam<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;BCL:0;ARA:13230040|35042699022|5073199012|4073199012;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;<font class="text-magenta">BCL</font>:&nbsp;BULK&nbsp;Confidence&nbsp;Level:&nbsp;<font class="text-green">0</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">The&nbsp;message&nbsp;isn&#x27;t&nbsp;from&nbsp;a&nbsp;bulk&nbsp;sender.</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(9)&nbsp;Test:&nbsp;<font class="text-cyan">Domain&nbsp;Impersonation</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;From<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Receivables&nbsp;<receivables@adnm.net><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Mail&nbsp;From:&nbsp;<receivables@adnm.net><br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Mail&nbsp;Domain:&nbsp;adnm.net<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;resolves&nbsp;to:&nbsp;34.95.15.10<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;reverse-DNS&nbsp;resolves&nbsp;to:&nbsp;10.15.95.34.bc.googleusercontent.com<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(sender's&nbsp;domain:&nbsp;<font class="text-cyan">googleusercontent.com</font>)<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;First&nbsp;Hop:&nbsp;&nbsp;&nbsp;YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM&nbsp;()<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;resolves&nbsp;to:&nbsp;<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;reverse-DNS&nbsp;resolves&nbsp;to:&nbsp;[fe80::1a99:c8a5:425:6a37]<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(first&nbsp;hop's&nbsp;domain:&nbsp;<font class="text-cyan">[fe80::1a99:c8a5:425:6a37]</font>)<br/>
+<br/>
+-&nbsp;Domain&nbsp;SPF:&nbsp;"v=spf1&nbsp;include:spf.protection.outlook.com&nbsp;-all"<br/>
+<br/>
+-&nbsp;(this&nbsp;test&nbsp;is&nbsp;very&nbsp;false-positive&nbsp;prone,&nbsp;below&nbsp;results&nbsp;can&nbsp;be&nbsp;inaccurate)<font class="text-red"><br/>
+<br/>
+-&nbsp;WARNING!&nbsp;Potential&nbsp;Domain&nbsp;Impersonation!<br/>
+</font>	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Mail's&nbsp;domain&nbsp;should&nbsp;resolve&nbsp;to:&nbsp;	&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">googleusercontent.com</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;But&nbsp;instead&nbsp;first&nbsp;hop&nbsp;resolved&nbsp;to:	&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-red">[fe80::1a99:c8a5:425:6a37]</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(10)&nbsp;Test:&nbsp;<font class="text-cyan">MS&nbsp;Defender&nbsp;ATP&nbsp;Message&nbsp;Properties</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-AtpMessageProperties<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;SA|SL<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;MS&nbsp;Defender&nbsp;Advanced&nbsp;Threat&nbsp;Protection&nbsp;enabled&nbsp;following&nbsp;protections&nbsp;on&nbsp;this&nbsp;message:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-magenta">Safe&nbsp;Attachments</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-magenta">Safe&nbsp;Links</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(11)&nbsp;Test:&nbsp;<font class="text-cyan">End-to-End&nbsp;Latency&nbsp;-&nbsp;Message&nbsp;Delivery&nbsp;Time</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-Transport-EndToEndLatency<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;00:00:17.9423298<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;How&nbsp;much&nbsp;time&nbsp;did&nbsp;it&nbsp;take&nbsp;to&nbsp;deliver&nbsp;message&nbsp;from&nbsp;End-to-End:&nbsp;<font class="text-cyan">00:00:17.9423298</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(12)&nbsp;Test:&nbsp;<font class="text-cyan">X-Forefront-Antispam-Report-Untrusted</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Forefront-Antispam-Report-Untrusted<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YQBPR0101MB5688.CANPRD01.PROD.OUTLO<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;OK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1102;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Microsoft&nbsp;Office365/Exchange&nbsp;ForeFront&nbsp;Anti-Spam&nbsp;report<br/>
+<br/>
+-&nbsp;<font class="text-magenta">CIP</font>:&nbsp;Connecting&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">255.255.255.255</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">LANG</font>:&nbsp;The&nbsp;language&nbsp;in&nbsp;which&nbsp;the&nbsp;message&nbsp;was&nbsp;written<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;en<br/>
+<br/>
+-&nbsp;<font class="text-magenta">IPV</font>:&nbsp;Ingress&nbsp;Peer&nbsp;Verification&nbsp;status<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NLI:&nbsp;The&nbsp;IP&nbsp;address&nbsp;was&nbsp;not&nbsp;found&nbsp;on&nbsp;any&nbsp;IP&nbsp;reputation&nbsp;list.<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SFV</font>:&nbsp;Message&nbsp;Filtering<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NSPM:&nbsp;<font class="text-green">Spam&nbsp;filtering&nbsp;marked&nbsp;the&nbsp;message&nbsp;as&nbsp;non-spam&nbsp;and&nbsp;the&nbsp;message&nbsp;was&nbsp;sent&nbsp;to&nbsp;the&nbsp;intended&nbsp;recipients.</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">H</font>:&nbsp;The&nbsp;HELO&nbsp;or&nbsp;EHLO&nbsp;string&nbsp;of&nbsp;the&nbsp;connecting&nbsp;email&nbsp;server.<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;YQBPR0101MB5688.CANPRD01.PROD.OUTLOOK.COM<br/>
+<br/>
+-&nbsp;<font class="text-magenta">CAT</font>:&nbsp;The&nbsp;category&nbsp;of&nbsp;protection&nbsp;policy<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;NONE:&nbsp;<font class="text-green">Clean&nbsp;message</font><br/>
+<br/>
+-&nbsp;<font class="text-magenta">DIR</font>:&nbsp;Direction&nbsp;of&nbsp;email&nbsp;verification<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;OUT:&nbsp;Outbound&nbsp;email&nbsp;verification<br/>
+<br/>
+-&nbsp;Message&nbsp;matched&nbsp;<font class="text-yellow">6</font>&nbsp;Anti-Spam&nbsp;rules&nbsp;(<font class="text-magenta">SFS</font>):<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(13230040)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(1800799024)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(366016)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(376014)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(38070700018)<br/>
+<br/>
+-&nbsp;<font class="text-magenta">SCL</font>:&nbsp;Spam&nbsp;Confidence&nbsp;Level:&nbsp;1<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Not&nbsp;spam</font>:&nbsp;The&nbsp;message&nbsp;skipped&nbsp;spam&nbsp;filtering<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(13)&nbsp;Test:&nbsp;<font class="text-cyan">X-Microsoft-Antispam-Untrusted</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-Microsoft-Antispam-Untrusted<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Microsoft&nbsp;Office365/Exchange&nbsp;ForeFront&nbsp;Anti-Spam&nbsp;report<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(14)&nbsp;Test:&nbsp;<font class="text-cyan">Office365&nbsp;Tenant&nbsp;ID</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X-MS-Exchange-CrossTenant-Id<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Office365&nbsp;Tenant&nbsp;ID:&nbsp;<font class="text-cyan">9d73024c-188c-4cc7-85f3-01568b4d323c</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Office365&nbsp;Tenant&nbsp;<font class="text-yellow">exists.</font><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Tenant&nbsp;ID&nbsp;found&nbsp;in&nbsp;following&nbsp;headers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;(01)&nbsp;Header:&nbsp;<font class="text-magenta">X-EOPTenantAttributedMessage</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;<font class="text-yellow">9d73024c-188c-4cc7-85f3-01568b4d323c</font>:0<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(15)&nbsp;Test:&nbsp;<font class="text-cyan">SMTP&nbsp;Header&nbsp;Contained&nbsp;IP&nbsp;address</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+(01)&nbsp;Header:&nbsp;<font class="text-yellow">ARC-Authentication-Results</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">&nbsp;40.107.192.75)&nbsp;smt</font><br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(02)&nbsp;Header:&nbsp;<font class="text-yellow">Authentication-Results</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">P&nbsp;is&nbsp;40.107.192.75)</font><br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(03)&nbsp;Header:&nbsp;<font class="text-yellow">Received</font>&nbsp;&nbsp;contained&nbsp;an&nbsp;IP&nbsp;address:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-green">com&nbsp;(40.107.192.75)&nbsp;by</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(16)&nbsp;Test:&nbsp;<font class="text-cyan">Other&nbsp;unrecognized&nbsp;Spam&nbsp;Related&nbsp;Headers</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Other&nbsp;Spam&nbsp;related&nbsp;SMTP&nbsp;headers&nbsp;that&nbsp;were&nbsp;not&nbsp;processed:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(01)&nbsp;Header:&nbsp;&nbsp;&nbsp;ARC-Message-Signature<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+i=2;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=microsoft.com;&nbsp;s=arcselector10001;&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-ChunkCount:X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-0:X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-1;&nbsp;bh=RJjEMGZ6o0aBldmVjw/xfs9Z9RY3nXPj81prUv5ABJc=;&nbsp;b=mV02SDopF4QOYeaHOHn4UHajAyNim1wxm9mo9xiyc3muPgA8CVQr5HwbqvT7esRoGek3bpg9jvOy/7cGWxE62s2+E6F1dyq1VJW+Phphm6VL2ZhxZgnhRqH5b5H+OjEt0mcUJeDSk/1Bq3HeIXdCKgCTwHbAo0UcxViKu50mKA9x9J90mhlH6ER8kCiNsbQu5OjjguoyLjxCXKhOcZEVuvLNhLmsghpcAclHYv5zw5kpwFEn6uHgYERBYcUyX8I9fJ//tulocpbHnpFxFTD+PMejT02SGAEK6+Jh8AwzruV/hddipaxmmW6/sK7EtnvTdQtAXOGgiS1d4imr5Nu5lA==<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(02)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;x-ms-exchange-anti<font class="text-red">spam</font>-relay<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;0<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(03)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-Microsoft-Anti<font class="text-red">spam</font>-Message-Info-Original<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?M/HrmMjRAR5sEiTA46SzgHu6coBamvWdTHno9qCUpirm6Oj4CGgf2a94Z9yQ?=&nbsp;=?us-ascii?Q?ortaFZsk6bq4H91oU7/JTDoWA7ySzCl<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(04)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-Original-ChunkCount<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;1<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(05)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-Exchange-Anti<font class="text-red">Spam</font>-MessageData-Original-0<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?geRh+QBXUwgJOUMtZzSwzwSLqQGzstNznu2llP2AIr/hTQUDB+XtDoBvC1yO?=&nbsp;=?us-ascii?Q?zh3cv8KUBSWPvLL2zba2AB5ci3q0ohJ<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(06)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-Microsoft-Anti<font class="text-red">spam</font>-Message-Info<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;spam<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;=?us-ascii?Q?qx6EkDu91DD47bMft78xj8H0RBlAM7zf2NKFbeW2z129QqFBjTf1t0jmrhLX?=&nbsp;=?us-ascii?Q?CuP+WimdKebjKk45/y3fBKUXpkncHyj<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(17)&nbsp;Test:&nbsp;<font class="text-cyan">Other&nbsp;interesting&nbsp;headers</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Other&nbsp;Interesting&nbsp;SMTP&nbsp;headers&nbsp;that&nbsp;were&nbsp;not&nbsp;processed:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(01)&nbsp;Header:&nbsp;&nbsp;&nbsp;ARC-Seal<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;microsoft<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+i=2;&nbsp;a=rsa-sha256;&nbsp;s=arcselector10001;&nbsp;d=<font class="text-red">microsoft</font>.com;&nbsp;cv=pass;&nbsp;b=GD7mc6fSYxZxNiHnPAhm0Gt0IXS6dbjJkQjNggTmMW1g3aSc/dwFMsoru3VtNg1Cb0kA8RxPCNojuTuInADHQlUP3JwX8CxHNRcvjQmMyD3k34OhcLG1/p0MWg/kzTj85PSuU9eoy5eI+Y2b+cAwiYefVqbM6VK+udhGpJZ8bBRH4C8hvr7fbeG6ymYZrTUbZYb+yx0J91tm33MCcsPzMOa1VEH/8m2ba1976+ssiFx6Bw4rQ5LVCujtNQoA6DKsk5/zSMUjoWYHfB8Q4LxTK7Zdt/Yop2B1iYGhSl+wKKcBeV2+vcB66j1VK6F3BLq/PbWXbDO2Y29ReKkfgXPj1A==<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(02)&nbsp;Header:&nbsp;&nbsp;&nbsp;DKIM-Signature<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;check<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font class="text-magenta">Value</font>:<br/>
+<br/>
+v=1;&nbsp;a=rsa-sha256;&nbsp;c=relaxed/relaxed;&nbsp;d=adnm.net;&nbsp;s=selector1;&nbsp;h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderAD<font class="text-red">Check</font>;&nbsp;bh=RJjEMGZ6o0aBldmVjw/xfs9Z9RY3nXPj81prUv5ABJc=;&nbsp;b=yf2nZJ9SBGS9OfYHxMuRe0gAOfUQh3yDLmhjRzcW1mcDRR3X0pLrayeVfYSd7QAPs+8dSxKeyKpBl655VXVT/1HFg7dZW2l6Q+iq/wX7IC2MXO+ATbjcBqEpLkwaZy4TIHDDLDZGNa3mnRzo6LT6hE50H9OuqQKUcic7cSt7FF4ZGpo/StCSL7coIHsWXC+OeEdIkwpoA3oQxZBZCcM2GqnOH804oHaIUe9NVHA9GGKfABr8s/B5yM48BRs2FA7j/RgSeiHKyXgbuf+BFfA2CdDe4OyDirl2WZC+JcnQFrJEk6uUsbIfYHoxNgSZNfbntEpfMO3iwfwAGiy5p87HRg==<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(03)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;x-ms-<font class="text-red">exchange</font>-messagesentrepresentingtype<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;1<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(04)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Office365</font>-Filtering-Correlation-Id<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;office365<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;3aea6398-e052-49d1-efa2-08dce46b27f6<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(05)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;x-ms-exchange-senderad<font class="text-red">check</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;check<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;1<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(06)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Transport-CrossTenantHeadersStamped<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;YT3PR01MB10558<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(07)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationStartTime<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;04&nbsp;Oct&nbsp;2024&nbsp;11:53:26.2896&nbsp;(UTC)<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(08)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationStartTimeReason<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;OriginalSubmit<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(09)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationInterval<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;1:00:00:00.0000000<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(10)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-ExpirationIntervalReason<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;OriginalSubmit<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(11)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-Network-Message-Id<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;3aea6398-e052-49d1-efa2-08dce46b27f6<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(12)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-MessageDirectionality<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Incoming<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(13)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Transport-CrossTenantHeadersStripped<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(14)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Transport-CrossTenantHeadersPromoted<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(15)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-AuthSource<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(16)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Organization-AuthAs<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Anonymous<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(17)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Office365</font>-Filtering-Correlation-Id-Prvs<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;office365<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;e3c26112-044d-43e2-ac36-08dce46b25c8<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(18)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-OriginalArrivalTime<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;04&nbsp;Oct&nbsp;2024&nbsp;11:53:26.0552&nbsp;(UTC)<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(19)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-Network-Message-Id<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;3aea6398-e052-49d1-efa2-08dce46b27f6<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(20)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-AuthSource<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;AM2PEPF0001C711.eurprd05.prod.outlook.com<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(21)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-AuthAs<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Anonymous<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(22)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-CrossTenant-FromEntityHeader<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;Internet<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;(23)&nbsp;<font class="text-magenta">Header</font>:&nbsp;&nbsp;&nbsp;X-MS-<font class="text-red">Exchange</font>-Processed-By-BccFoldering<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword:&nbsp;&nbsp;exchange<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;&nbsp;&nbsp;&nbsp;15.20.8026.016<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(18)&nbsp;Test:&nbsp;<font class="text-cyan">Security&nbsp;Appliances&nbsp;Spotted</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;During&nbsp;headers&nbsp;analysis,&nbsp;spotted&nbsp;following&nbsp;clues&nbsp;about&nbsp;Security&nbsp;Appliances:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;Defender&nbsp;Advanced&nbsp;Threat&nbsp;Protection</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;Defender&nbsp;for&nbsp;Office365&nbsp;-&nbsp;Safe&nbsp;Attachments</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;ForeFront&nbsp;Anti-Spam</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">MS&nbsp;Defender&nbsp;for&nbsp;Office365&nbsp;-&nbsp;Safe&nbsp;Links</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">Office365</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(19)&nbsp;Test:&nbsp;<font class="text-cyan">Email&nbsp;Providers&nbsp;Infrastructure&nbsp;Clues</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Mail&nbsp;contents&nbsp;analysis&nbsp;shown&nbsp;that&nbsp;this&nbsp;e-mail&nbsp;passed&nbsp;through&nbsp;the&nbsp;following&nbsp;third-party&nbsp;Mail&nbsp;providers:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-green">Emma</font>&nbsp;-&nbsp;url:&nbsp;https://myemma.com/<br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(20)&nbsp;Test:&nbsp;<font class="text-cyan">Identified&nbsp;Sender&nbsp;Addresses</font><br/>
+<br/>
+<font class="text-blue">HEADER</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Return-Path<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;From<br/>
+<br/>
+<br/>
+<font class="text-blue">DESCRIPTION</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Sender's&nbsp;address&nbsp;was&nbsp;found&nbsp;in&nbsp;2&nbsp;different&nbsp;SMTP&nbsp;headers.<br/>
+<br/>
+<font class="text-blue">VALUE</font>:&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;receivables@adnm.net<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;receivables@adnm.net<br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;Identified&nbsp;sender&nbsp;addresses&nbsp;(2):<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">Return-Path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>:&nbsp;<font class="text-green">receivables@adnm.net</font><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">From&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>:&nbsp;<font class="text-green">receivables@adnm.net</font><br/>
+</div><br/>
+<br/>
+<div><hr/><br/>
+(21)&nbsp;Test:&nbsp;<font class="text-cyan">Unsual&nbsp;SMTP&nbsp;headers</font><br/>
+<br/>
+<font class="text-blue">ANALYSIS</font>:<br/>
+<br/>
+-&nbsp;This&nbsp;script&nbsp;is&nbsp;aware&nbsp;of&nbsp;210&nbsp;typical&nbsp;SMTP&nbsp;Headers.<br/>
+<br/>
+-&nbsp;Below&nbsp;1&nbsp;headers&nbsp;are&nbsp;considered&nbsp;unusual:<br/>
+<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<font class="text-yellow">X-EOPTenantAttributedMessage</font>&nbsp;&nbsp;:&nbsp;9d73024c-188c-4cc7-85f3-01568b4d323c:0<br/>
+</div><br/>
+
+  </body>
+</html>
