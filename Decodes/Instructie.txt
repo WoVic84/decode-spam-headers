@@ -1,4 +1,4 @@
-cd "c:\dynamate\decode-spam-headers\python"
-py decode-spam-headers.py mail2.txt -f html -o report2.html
-start-process report2.html
+cd "c:\dynamate\github\decode-spam-headers\"
+py decode-spam-headers.py "decodes\mail6.txt" -f html -o "decodes\report6.html"
+start-process "decodes\report6.html"
 
